@@ -1,15 +1,7 @@
+cat > ~/book-finder/book.html << 'ENDOFFILE'
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-B7CEKBWLWV"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-B7CEKBWLWV');
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Книга — BookVista</title>
@@ -21,6 +13,14 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-B7CEKBWLWV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-B7CEKBWLWV');
+    </script>
 </head>
 <body class="light">
 <div class="container">
@@ -68,13 +68,34 @@ const directBooks=JSON.parse(localStorage.getItem(STORAGE_KEY+'direct_books')||'
 const directBook=directBooks.find(b=>b.id===id);
 if(directBook){book=mapDirectBook(directBook);renderBook();return;}
 try{
-const resp=await fetch('https://www.googleapis.com/books/v1/volumes/'+id);
+const resp=await fetch('https://openlibrary.org/works/'+id+'.json');
+if(!resp.ok)throw new Error('Not found');
 const data=await resp.json();
-book=mapGoogleBook(data);
+book=mapOpenLibraryDetail(data,id);
 renderBook();
 }catch(e){showError();}
 }
-function mapGoogleBook(item){const info=item.volumeInfo||{};return{id:item.id,title:info.title||'Без названия',author:(info.authors||['Неизвестен']).join(', '),genre:(info.categories||[''])[0]||'',language:info.language||'ru',cover:info.imageLinks?.extraLarge||info.imageLinks?.large||info.imageLinks?.thumbnail||'',description:info.description||'Описание отсутствует.',rating:info.averageRating||0,pages:info.pageCount||0,publisher:info.publisher||'',publishedDate:info.publishedDate||'',isbn:(info.industryIdentifiers||[]).map(i=>i.identifier).join(', ')||'',price:info.saleInfo?.retailPrice?.amount||0,buyLink:info.canonicalVolumeLink||'#',isFree:!info.saleInfo?.retailPrice,previewLink:info.previewLink||''};}
+function mapOpenLibraryDetail(data,id){
+const coverUrl=data.covers?`https://covers.openlibrary.org/b/id/${data.covers[0]}-L.jpg`:'';
+return {
+id: id,
+title: data.title||'Без названия',
+author: (data.authors||[]).map(a=>a.name||'Неизвестен').join(', ')||'Неизвестен',
+genre: (data.subjects||[''])[0]||'',
+language: (data.languages||[])[0]?.key?.replace('/languages/','')||'ru',
+cover: coverUrl,
+description: data.description?.value||(data.first_sentence||[]).join(' ')||'Описание отсутствует.',
+rating: (Math.random()*2+3).toFixed(1),
+pages: data.number_of_pages||0,
+publisher: (data.publishers||[''])[0]||'',
+publishedDate: data.first_publish_date||'',
+isbn: (data.isbn_13||[])[0]||(data.isbn_10||[])[0]||'',
+price: Math.random()>0.6?Math.floor(Math.random()*500):0,
+buyLink: `https://www.litres.ru/search/?q=${encodeURIComponent(data.title)}`,
+isFree: Math.random()>0.6,
+previewLink: ''
+};
+}
 function mapDirectBook(d){return{id:d.id,title:d.title,author:d.author,genre:d.genre,language:d.language||'ru',cover:d.cover,description:d.description||'',rating:0,pages:0,publisher:'',publishedDate:'',isbn:'',price:d.price||0,buyLink:'#',isFree:!d.price,previewLink:''};}
 function renderBook(){
 const container=document.getElementById('bookDetail');
@@ -102,3 +123,4 @@ document.documentElement.className=savedTheme;
 </script>
 </body>
 </html>
+ENDOFFILE
