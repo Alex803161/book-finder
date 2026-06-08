@@ -107,22 +107,6 @@
                 <select id="filterLang" class="filter-select">
                     <option value="" data-i18n="langAny">Любой язык</option>
                     <option value="rus">Русский</option>
-                    <option value="eng">Английский</option>
-                    <option value="ger">Немецкий</option>
-                    <option value="fre">Французский</option>
-                    <option value="spa">Испанский</option>
-                    <option value="ita">Итальянский</option>
-                    <option value="por">Португальский</option>
-                    <option value="chi">Китайский</option>
-                    <option value="jpn">Японский</option>
-                    <option value="kor">Корейский</option>
-                    <option value="ara">Арабский</option>
-                    <option value="heb">Иврит</option>
-                    <option value="tur">Турецкий</option>
-                    <option value="pol">Польский</option>
-                    <option value="ukr">Украинский</option>
-                    <option value="bel">Белорусский</option>
-                    <option value="kaz">Казахский</option>
                 </select>
             </div>
         </div>
@@ -232,7 +216,6 @@ renderBooks();
 function mapOpenLibraryBook(doc){
 const coverId=doc.cover_i;
 const coverUrl=coverId?`https://covers.openlibrary.org/b/id/${coverId}-M.jpg`:'';
-// Используем поле language из API (массив кодов, например ['rus', 'eng'])
 const lang = (doc.language && doc.language.length) ? doc.language[0].toLowerCase() : 'eng';
 return {
 id: doc.key.replace('/works/','')||doc.cover_edition_key||doc.key,
