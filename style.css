@@ -66,12 +66,11 @@ select, input[type="range"] { width: 100%; }
   border: 1px solid var(--border-color); border-radius: 50%;
   width: 28px; height: 28px; display: flex;
   align-items: center; justify-content: center;
-  cursor: pointer; color: #1a1a1a;           /* чёрный цвет для светлой темы */
+  cursor: pointer; color: #1a1a1a;
   font-weight: 900;
   text-shadow: 0 1px 2px rgba(255,255,255,0.8);
   transition: all 0.2s;
 }
-/* Крестики в карточках (недавние, сохранённые) - усиление светлой темы */
 .book-card .btn-close-settings,
 #savedSearchesList .btn-close-settings {
   color: #1a1a1a;
@@ -103,20 +102,39 @@ html.dark #savedSearchesList .btn-close-settings:hover {
 .color-dot.active { border-color: var(--accent-color); }
 #fontSizeValue { font-size: 0.85rem; color: var(--muted-color); margin-left: 8px; text-shadow: var(--text-shadow-light); }
 .lang-switch { display: flex; gap: 6px; align-items: center; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 6px 12px; box-shadow: var(--card-shadow); font-size: 1.1rem; cursor: pointer; z-index: 150; }
-.lang-option { padding: 2px 8px; border-radius: 12px; cursor: pointer; transition: background 0.2s; }
+.lang-option { padding: 2px 8px; border-radius: 12px; cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s; }
 .lang-option.active { background: var(--accent-color); color: white; font-weight: 600; }
+/* Улучшение видимости переключателя языка в тёмной теме */
+html.dark .lang-option {
+  color: #fff;
+  border: 1px solid transparent;
+}
+html.dark .lang-option.active {
+  background: var(--accent-color);
+  color: #fff;
+  border-color: var(--accent-color);
+}
 .header { text-align: center; margin: 10px 0 30px; padding: 10px 0; }
 .logo-text {
   font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 900; letter-spacing: 0.5px;
   background: linear-gradient(135deg, var(--accent-color), #a78bfa);
   background-clip: text; -webkit-background-clip: text; color: transparent;
-  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.4));           /* тёмная тень для букв */
-  text-shadow: 0 1px 0 rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.3);   /* усиленная тень */
+  /* Тёмный контур (обводка) */
+  text-shadow:
+    -1px -1px 0 #2c2c2c,
+     1px -1px 0 #2c2c2c,
+    -1px  1px 0 #2c2c2c,
+     1px  1px 0 #2c2c2c,
+     0   2px 4px rgba(0,0,0,0.4);
   display: inline-block; transition: text-shadow 0.3s;
 }
 html.dark .logo-text {
-  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.6));
-  text-shadow: 0 0 8px rgba(255,255,255,0.4), 0 0 2px rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.8), 0 4px 8px rgba(0,0,0,0.6);
+  text-shadow:
+    -1px -1px 0 #111,
+     1px -1px 0 #111,
+    -1px  1px 0 #111,
+     1px  1px 0 #111,
+     0 0 8px rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.6);
   background: linear-gradient(135deg, #FFD8A8, #C0A0FF);
   background-clip: text; -webkit-background-clip: text;
 }
@@ -217,7 +235,19 @@ html.dark input:focus, html.dark textarea:focus { box-shadow: 0 0 0 3px rgba(200
 textarea { border-radius: 14px; resize: vertical; min-height: 100px; }
 .subscribe-section { background: var(--card-bg); border-radius: 20px; padding: 24px; margin: 30px 0; border: 1px solid var(--border-color); box-shadow: var(--card-shadow); }
 .subscribe-section h3 { color: var(--text-color); text-shadow: var(--text-shadow-light); }
-.site-footer { margin-top: 40px; padding: 20px 0; text-align: center; color: var(--muted-color); border-top: 1px solid var(--border-color); text-shadow: var(--text-shadow-light); }
+/* Исправление читаемости футера в тёмной теме */
+.site-footer {
+  margin-top: 40px;
+  padding: 20px 0;
+  text-align: center;
+  color: var(--muted-color);
+  border-top: 1px solid var(--border-color);
+  text-shadow: 0 1px 2px rgba(255,255,255,0.5);   /* лёгкая тень для светлой темы */
+}
+html.dark .site-footer {
+  color: #D7CCC8;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);          /* чёткая тень без размытия */
+}
 .site-footer a { color: var(--accent-color); text-decoration: none; }
 .site-footer a:hover { text-decoration: underline; }
 .book-detail { background: var(--card-bg); border-radius: 20px; padding: 30px; border: 1px solid var(--border-color); box-shadow: var(--card-shadow); display: flex; gap: 30px; flex-wrap: wrap; }
@@ -231,24 +261,11 @@ html.dark .book-detail-cover { background: #3D3830; }
 h1, h2, h3 { color: var(--text-color); text-shadow: var(--text-shadow-light); }
 p, span, div { color: var(--text-color); }
 .no-results-text { color: var(--text-color) !important; text-shadow: var(--text-shadow-light) !important; }
-/* Усиление для проблемных элементов в тёмной теме */
 html.dark h3, html.dark .subscribe-section h3, html.dark .site-footer, html.dark .no-results-text, html.dark .books-list p {
   color: #FFF3E0 !important;
   text-shadow: 0 2px 6px rgba(0,0,0,0.8), 0 0 4px rgba(255,255,255,0.3) !important;
 }
 html.dark .page-title { color: #D7CCC8 !important; text-shadow: 0 1px 4px rgba(0,0,0,0.7), 0 0 2px rgba(255,255,255,0.2); }
-/* Крестики в карточках (недавние, сохранённые) - максимальная контрастность */
-html.dark .book-card .btn-close-settings,
-html.dark #savedSearchesList .btn-close-settings {
-  color: #FFFFFF;
-  border-color: #555;
-  background: rgba(0,0,0,0.4);
-}
-html.dark .book-card .btn-close-settings:hover,
-html.dark #savedSearchesList .btn-close-settings:hover {
-  background: rgba(255,255,255,0.2);
-  border-color: #FFF;
-}
 @media (max-width: 600px) {
   :root { --container-padding: 10px; }
   .top-bar { padding: 10px 0; }
