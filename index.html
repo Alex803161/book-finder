@@ -106,23 +106,23 @@
                 <label data-i18n="filterLang">Язык</label>
                 <select id="filterLang" class="filter-select">
                     <option value="" data-i18n="langAny">Любой язык</option>
-                    <option value="ru">Русский</option>
-                    <option value="en">Английский</option>
-                    <option value="de">Немецкий</option>
-                    <option value="fr">Французский</option>
-                    <option value="es">Испанский</option>
-                    <option value="it">Итальянский</option>
-                    <option value="pt">Португальский</option>
-                    <option value="zh">Китайский</option>
-                    <option value="ja">Японский</option>
-                    <option value="ko">Корейский</option>
-                    <option value="ar">Арабский</option>
-                    <option value="he">Иврит</option>
-                    <option value="tr">Турецкий</option>
-                    <option value="pl">Польский</option>
-                    <option value="uk">Украинский</option>
-                    <option value="be">Белорусский</option>
-                    <option value="kk">Казахский</option>
+                    <option value="rus">Русский</option>
+                    <option value="eng">Английский</option>
+                    <option value="ger">Немецкий</option>
+                    <option value="fre">Французский</option>
+                    <option value="spa">Испанский</option>
+                    <option value="ita">Итальянский</option>
+                    <option value="por">Португальский</option>
+                    <option value="chi">Китайский</option>
+                    <option value="jpn">Японский</option>
+                    <option value="kor">Корейский</option>
+                    <option value="ara">Арабский</option>
+                    <option value="heb">Иврит</option>
+                    <option value="tur">Турецкий</option>
+                    <option value="pol">Польский</option>
+                    <option value="ukr">Украинский</option>
+                    <option value="bel">Белорусский</option>
+                    <option value="kaz">Казахский</option>
                 </select>
             </div>
         </div>
@@ -232,12 +232,14 @@ renderBooks();
 function mapOpenLibraryBook(doc){
 const coverId=doc.cover_i;
 const coverUrl=coverId?`https://covers.openlibrary.org/b/id/${coverId}-M.jpg`:'';
+// Используем поле language из API (массив кодов, например ['rus', 'eng'])
+const lang = (doc.language && doc.language.length) ? doc.language[0].toLowerCase() : 'eng';
 return {
 id: doc.key.replace('/works/','')||doc.cover_edition_key||doc.key,
 title: doc.title||'Без названия',
 author: (doc.author_name||['Неизвестен']).join(', '),
 genre: (doc.subject||['fiction'])[0].toLowerCase(),
-language: (doc.language||['ru'])[0]||'ru',
+language: lang,
 cover: coverUrl,
 description: (doc.first_sentence||[]).slice(0,3).join(' ')||'Описание отсутствует.',
 rating: (Math.random()*2+3).toFixed(1),
@@ -246,7 +248,7 @@ buyLink: `https://www.litres.ru/search/?q=${encodeURIComponent(doc.title)}`,
 isFree: false
 };
 }
-function getSampleBooks(){return [{id:'1',title:'Мастер и Маргарита',author:'М. Булгаков',genre:'fiction',language:'ru',rating:4.8,price:null,cover:'',buyLink:'https://www.litres.ru/search/?q=Мастер+и+Маргарита',isFree:false},{id:'2',title:'1984',author:'Дж. Оруэлл',genre:'fantasy',language:'ru',rating:4.6,price:null,cover:'',buyLink:'https://www.litres.ru/search/?q=1984',isFree:false},{id:'3',title:'Sapiens',author:'Ю. Н. Харари',genre:'nonfiction',language:'ru',rating:4.7,price:null,cover:'',buyLink:'https://www.litres.ru/search/?q=Sapiens',isFree:false},{id:'4',title:'Убийство в Восточном экспрессе',author:'А. Кристи',genre:'mystery',language:'ru',rating:4.5,price:null,cover:'',buyLink:'https://www.litres.ru/search/?q=Убийство+в+Восточном+экспрессе',isFree:false}];}
+function getSampleBooks(){return [{id:'1',title:'Мастер и Маргарита',author:'М. Булгаков',genre:'fiction',language:'rus',rating:4.8,price:null,cover:'',buyLink:'https://www.litres.ru/search/?q=Мастер+и+Маргарита',isFree:false},{id:'2',title:'1984',author:'Дж. Оруэлл',genre:'fantasy',language:'eng',rating:4.6,price:null,cover:'',buyLink:'https://www.litres.ru/search/?q=1984',isFree:false},{id:'3',title:'Sapiens',author:'Ю. Н. Харари',genre:'nonfiction',language:'eng',rating:4.7,price:null,cover:'',buyLink:'https://www.litres.ru/search/?q=Sapiens',isFree:false},{id:'4',title:'Убийство в Восточном экспрессе',author:'А. Кристи',genre:'mystery',language:'rus',rating:4.5,price:null,cover:'',buyLink:'https://www.litres.ru/search/?q=Убийство+в+Восточном+экспрессе',isFree:false}];}
 function renderBooks(){
 const grid=document.getElementById('booksContainer');
 const toShow=filteredBooks.slice(0,displayCount);
