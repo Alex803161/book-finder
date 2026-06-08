@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Блог — BookVista</title>
+    <meta name="description" content="Подборки книг и обзоры. Найдите свою идеальную книгу.">
+    <link rel="canonical" href="https://alex803161.github.io/book-finder/blog.html">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-B7CEKBWLWV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-B7CEKBWLWV');
+    </script>
+</head>
+<body class="light">
+<div class="container">
+    <div class="top-bar">
+        <a href="index.html" style="text-decoration:none;color:var(--accent-color);font-weight:700;font-size:1.2rem;">📚 BookVista</a>
+        <div class="lang-switch" id="langSwitch">
+            <span class="lang-option active" data-lang="ru">🇷🇺</span>
+            <span class="lang-option" data-lang="en">🇬🇧</span>
+        </div>
+    </div>
+    <main style="margin-top:30px;">
+        <h1 class="page-title">📖 Блог BookVista</h1>
+        <p style="text-align:center; color:var(--muted-color); margin-bottom:30px;">Подборки, обзоры и рекомендации книг для уютного чтения</p>
+        <div class="blog-grid">
+            <article class="blog-card">
+                <h2>📚 10 книг, которые стоит прочитать этой осенью</h2>
+                <p class="blog-meta">8 июня 2026</p>
+                <p>Тёплые и атмосферные истории для длинных вечеров. От классики до современных бестселлеров.</p>
+                <a href="#" class="btn btn-outline">Читать →</a>
+            </article>
+            <article class="blog-card">
+                <h2>🔍 Как выбрать книгу под настроение: гид по жанрам</h2>
+                <p class="blog-meta">5 июня 2026</p>
+                <p>Фэнтези, детективы, романы или научпоп — поможем найти идеальную книгу под ваш запрос.</p>
+                <a href="#" class="btn btn-outline">Читать →</a>
+            </article>
+            <article class="blog-card">
+                <h2>👶 Детские книги, которые понравятся и взрослым</h2>
+                <p class="blog-meta">1 июня 2026</p>
+                <p>Совместное чтение с детьми может быть увлекательным и для родителей. Наши рекомендации.</p>
+                <a href="#" class="btn btn-outline">Читать →</a>
+            </article>
+        </div>
+        <div style="text-align:center; margin-top:30px;">
+            <a href="index.html" class="btn btn-outline">← На главную</a>
+        </div>
+    </main>
+    <footer class="site-footer">
+        <p>© 2025 BookVista — уютная книжная полка</p>
+    </footer>
+</div>
+<script src="translations.js"></script>
+<script>
+    // Применяем сохранённую тему
+    const savedTheme=localStorage.getItem('theme')||'light';
+    document.documentElement.className=savedTheme;
+</script>
+</body>
+</html>
