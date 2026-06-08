@@ -102,7 +102,6 @@
                     <option value="education">Образование</option>
                 </select>
             </div>
-            <!-- Фильтр языка убран -->
         </div>
     </div>
     <!-- Сортировка -->
@@ -124,6 +123,7 @@
         <a href="favorites.html" class="btn btn-outline" data-i18n="favorites">Избранное</a>
         <a href="post-book.html" class="btn btn-outline" data-i18n="addBook">Добавить книгу</a>
         <a href="admin.html" class="btn btn-outline" data-i18n="admin">Управление</a>
+        <a href="blog.html" class="btn btn-outline" data-i18n="blog">Блог</a>
     </div>
     <div class="subscribe-section">
         <h3 data-i18n="subscribeBtn" style="margin-bottom:12px;">Подписаться на обновления</h3>
@@ -202,7 +202,7 @@ function getDirectBooks(){
 }
 async function loadInitialBooks(){
 try{
-const resp=await fetch(OPENLIBRARY_API+'?q=subject:fiction&limit=40');
+const resp=await fetch(OPENLIBRARY_API+'?q=subject:fiction&limit=100');   // 100 книг
 if(!resp.ok)throw new Error('API error');
 const data=await resp.json();
 const directBooks=getDirectBooks();
