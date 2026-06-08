@@ -263,7 +263,12 @@ function applyFiltersAndSort(){
     filteredBooks=books.filter(b=>(!genre||b.genre===genre));
     const sortBy=document.getElementById('sortSelect').value;
     if(sortBy==='rating'){
-        filteredBooks.sort((a,b)=>(b.rating||0)-(a.rating||0));
+        filteredBooks.sort((a,b)=>{
+            // сортировка по итоговому рейтингу (пользовательский + из API)
+            const aRating = getUserAverageRating(a.id) || a.rating || 0;
+            const bRating = getUserAverageRating(b.id) || b.rating || 0;
+            return bRating - aRating;
+        });
     } else if(sortBy==='title'){
         filteredBooks.sort((a,b)=>a.title.localeCompare(b.title));
     } else if(sortBy==='newest'){
@@ -275,6 +280,14 @@ function applyFiltersAndSort(){
     }
     currentPage=1;
     renderBooks();
+}
+function getUserAverageRating(bookId) {
+    const key = STORAGE_KEY + 'rating_' + bookId;
+    const data = JSON.parse(localStorage.getItem(key) || 'null');
+    if (data && data.count > 0) {
+        return parseFloat((data.sum / data.count).toFixed(1));
+    }
+    return null;
 }
 function renderBooks(){
 const grid=document.getElementById('booksContainer');
@@ -290,7 +303,12 @@ grid.innerHTML=toShow.map(book=>{
     const placeholderHTML=book.cover
         ? `<div class="book-cover-placeholder" style="display:none;">📖</div>`
         : `<div class="book-cover-placeholder">📖</div>`;
-    const ratingHTML=book.rating?`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto;font-size:0.8rem;"><span>★ ${book.rating}</span></div>`:'';
+    
+    // Итоговый рейтинг
+    const userAvg = getUserAverageRating(book.id);
+    const displayRating = userAvg !== null ? userAvg : book.rating;
+    const ratingHTML = displayRating ? `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto;font-size:0.8rem;"><span>★ ${displayRating}</span></div>` : '';
+    
     return `<div class="book-card" onclick="openBook('${book.id}')">
         <div class="book-cover">
             ${coverHTML}
