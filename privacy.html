@@ -27,6 +27,7 @@
     <main style="margin-top:30px;">
         <h1>Политика конфиденциальности</h1>
         <p>Мы не собираем личные данные без вашего согласия. Все данные (избранное, подписки) хранятся локально в вашем браузере.</p>
+        <p style="margin-top:20px;"><a href="index.html" class="btn btn-outline">← На главную</a></p>
     </main>
     <footer class="site-footer">
         <p>© 2025 BookVista</p>
@@ -39,6 +40,15 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'G-B7CEKBWLWV');
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/book-finder/sw.js')
+      .then(reg => console.log('SW registered'))
+      .catch(err => console.log('SW fail', err));
+  });
+}
 </script>
 </body>
 </html>
