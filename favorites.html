@@ -79,9 +79,13 @@ if(!favs.length){grid.innerHTML='<p style="grid-column:1/-1;text-align:center;pa
 grid.innerHTML=favs.map(book=>'<div class="book-card"><div class="book-cover">📚</div><div class="book-title">'+book.title+'</div><div class="book-author">'+book.author+'</div>'+(book.rating?'<div style="font-size:0.85rem;">★ '+book.rating+'</div>':'')+'<div class="book-actions" style="margin-top:8px;"><button class="save-btn saved" onclick="removeFavorite(\''+book.id+'\')">❤️</button></div></div>').join('');
 }
 function removeFavorite(id){
-const favs=JSON.parse(localStorage.getItem(STORAGE_KEY+'fav')||'[]');
-localStorage.setItem(STORAGE_KEY+'fav',JSON.stringify(favs.filter(f=>f.id!==id)));
-renderFavorites(document.getElementById('sortSelect').value);
+    const favs=JSON.parse(localStorage.getItem(STORAGE_KEY+'fav')||'[]');
+    const book = favs.find(f=>f.id===id);
+    if(book) {
+        gtag('event', 'remove_from_favorites', { event_category: 'engagement', event_label: book.title });
+    }
+    localStorage.setItem(STORAGE_KEY+'fav',JSON.stringify(favs.filter(f=>f.id!==id)));
+    renderFavorites(document.getElementById('sortSelect').value);
 }
 function exportCSV(){
 const favs=JSON.parse(localStorage.getItem(STORAGE_KEY+'fav')||'[]');
@@ -96,6 +100,15 @@ document.getElementById('exportBtn').addEventListener('click',exportCSV);
 document.getElementById('clearBtn').addEventListener('click',()=>{if(confirm('Очистить избранное?')){localStorage.removeItem(STORAGE_KEY+'fav');renderFavorites();}});
 document.querySelectorAll('.lang-option').forEach(opt=>{opt.addEventListener('click',()=>{currentLang=opt.dataset.lang;localStorage.setItem('lang',currentLang);applyLanguage();});});
 });
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/book-finder/sw.js')
+      .then(reg => console.log('SW registered'))
+      .catch(err => console.log('SW fail', err));
+  });
+}
 </script>
 </body>
 </html>
