@@ -104,7 +104,6 @@ html.dark #savedSearchesList .btn-close-settings:hover {
 .lang-switch { display: flex; gap: 6px; align-items: center; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 6px 12px; box-shadow: var(--card-shadow); font-size: 1.1rem; cursor: pointer; z-index: 150; }
 .lang-option { padding: 2px 8px; border-radius: 12px; cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s; }
 .lang-option.active { background: var(--accent-color); color: white; font-weight: 600; }
-/* Улучшение видимости переключателя языка в тёмной теме */
 html.dark .lang-option {
   color: #fff;
   border: 1px solid transparent;
@@ -115,36 +114,28 @@ html.dark .lang-option.active {
   border-color: var(--accent-color);
 }
 .header { text-align: center; margin: 10px 0 30px; padding: 10px 0; }
+/* === ИСХОДНЫЙ ЛОГОТИП (САМЫЙ ПЕРВЫЙ ВАРИАНТ) === */
 .logo-text {
   font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 900; letter-spacing: 0.5px;
   background: linear-gradient(135deg, var(--accent-color), #a78bfa);
   background-clip: text; -webkit-background-clip: text; color: transparent;
-  /* Тёмный контур (обводка) */
-  text-shadow:
-    -1px -1px 0 #2c2c2c,
-     1px -1px 0 #2c2c2c,
-    -1px  1px 0 #2c2c2c,
-     1px  1px 0 #2c2c2c,
-     0   2px 4px rgba(0,0,0,0.4);
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.15));
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.2), 0 4px 8px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.05);
   display: inline-block; transition: text-shadow 0.3s;
 }
 html.dark .logo-text {
-  text-shadow:
-    -1px -1px 0 #111,
-     1px -1px 0 #111,
-    -1px  1px 0 #111,
-     1px  1px 0 #111,
-     0 0 8px rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.6);
-  background: linear-gradient(135deg, #FFD8A8, #C0A0FF);
-  background-clip: text; -webkit-background-clip: text;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+  text-shadow: 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.4), 0 4px 8px rgba(0,0,0,0.3), 0 8px 16px rgba(0,0,0,0.2);
 }
+/* === ИСХОДНЫЙ ПОДЗАГОЛОВОК === */
 .page-title {
   font-size: clamp(1.3rem, 3.5vw, 1.7rem); font-weight: 400; margin: 18px 0 6px;
   color: var(--muted-color); letter-spacing: 0.3px; font-style: italic;
   text-shadow: 0 1px 1px rgba(255,255,255,0.5), 0 2px 3px rgba(0,0,0,0.1);
   transition: color 0.3s, text-shadow 0.3s;
 }
-html.dark .page-title { color: #D7CCC8; text-shadow: 0 1px 1px rgba(0,0,0,0.3), 0 2px 3px rgba(0,0,0,0.2); }
+html.dark .page-title { color: #C9B8A8; text-shadow: 0 1px 1px rgba(0,0,0,0.3), 0 2px 3px rgba(0,0,0,0.2); }
+
 .search-section { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: var(--card-shadow); margin-bottom: 24px; border: 1px solid var(--border-color); }
 .search-row { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; flex-wrap: nowrap; }
 .search-input {
@@ -235,18 +226,18 @@ html.dark input:focus, html.dark textarea:focus { box-shadow: 0 0 0 3px rgba(200
 textarea { border-radius: 14px; resize: vertical; min-height: 100px; }
 .subscribe-section { background: var(--card-bg); border-radius: 20px; padding: 24px; margin: 30px 0; border: 1px solid var(--border-color); box-shadow: var(--card-shadow); }
 .subscribe-section h3 { color: var(--text-color); text-shadow: var(--text-shadow-light); }
-/* Исправление читаемости футера в тёмной теме */
+/* Футер */
 .site-footer {
   margin-top: 40px;
   padding: 20px 0;
   text-align: center;
   color: var(--muted-color);
   border-top: 1px solid var(--border-color);
-  text-shadow: 0 1px 2px rgba(255,255,255,0.5);   /* лёгкая тень для светлой темы */
+  text-shadow: 0 1px 2px rgba(255,255,255,0.5);
 }
 html.dark .site-footer {
   color: #D7CCC8;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);          /* чёткая тень без размытия */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 .site-footer a { color: var(--accent-color); text-decoration: none; }
 .site-footer a:hover { text-decoration: underline; }
