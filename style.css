@@ -205,16 +205,18 @@ html.dark .book-cover { background: #3D3830; }
   text-shadow: var(--text-shadow-light);
 }
 html.dark .book-title {
-  color: #FFF8E7;   /* светло-кремовый */
+  color: #FFF8E7;
   text-shadow:
     -1px -1px 0 #000,
      1px -1px 0 #000,
     -1px  1px 0 #000,
      1px  1px 0 #000,
-     0   2px 4px rgba(0,0,0,0.6);   /* чёткий контур + тень */
+     0   2px 4px rgba(0,0,0,0.6);
 }
 
 .book-author { font-size: 0.8rem; color: var(--muted-color); margin-bottom: 8px; text-shadow: var(--text-shadow-light); }
+html.dark .book-author { color: #D7CCC8; }   /* улучшили контраст авторов */
+
 .book-actions { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: auto; }
 .save-btn { background: none; border: 1px solid var(--border-color); border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted-color); transition: all 0.2s; }
 .save-btn.saved { background: #ff6b6b; color: white; border-color: #dc2626; }
@@ -274,7 +276,9 @@ html.dark .book-detail-info h1 {
      0   2px 4px rgba(0,0,0,0.6);
 }
 .book-detail-author { font-size: 1.1rem; color: var(--muted-color); margin-bottom: 16px; text-shadow: var(--text-shadow-light); }
+html.dark .book-detail-author { color: #D7CCC8; }
 .book-detail-info p { color: var(--text-color); text-shadow: var(--text-shadow-light); }
+html.dark .book-detail-info p { color: #F5F0E0; }
 h1, h2, h3 { color: var(--text-color); text-shadow: var(--text-shadow-light); }
 p, span, div { color: var(--text-color); }
 .no-results-text { color: var(--text-color) !important; text-shadow: var(--text-shadow-light) !important; }
