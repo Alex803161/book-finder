@@ -2,6 +2,18 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'light';
+      document.documentElement.className = theme;
+      const font = localStorage.getItem('font');
+      if (font) document.documentElement.style.setProperty('--font-family', font);
+      const fontSize = localStorage.getItem('fontSize');
+      if (fontSize) document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+      const textColor = localStorage.getItem('textColor');
+      if (textColor) document.documentElement.style.setProperty('--text-color', textColor);
+    })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Книга — BookVista</title>
     <meta name="description" content="Подробная информация о книге: автор, описание, рейтинг, цена.">
@@ -110,10 +122,8 @@ renderBook();
 }
 function mapOpenLibraryDetail(data,id){
 const coverUrl=data.covers?`https://covers.openlibrary.org/b/id/${data.covers[0]}-L.jpg`:'';
-// Реальные рейтинги из Open Library
 let rating = null;
 if (data.ratings_average) rating = parseFloat(data.ratings_average).toFixed(1);
-// Ссылки на чтение и скачивание
 const previewLink = data.links?.find(l=>l.type==='access')?.url || `https://openlibrary.org/works/${id}`;
 const downloadLink = data.ebooks?.[0]?.download_url || '';
 return {
@@ -174,8 +184,6 @@ document.addEventListener('DOMContentLoaded',()=>{
 applyLanguage();
 loadBook();
 document.querySelectorAll('.lang-option').forEach(opt=>{opt.addEventListener('click',()=>{currentLang=opt.dataset.lang;localStorage.setItem('lang',currentLang);applyLanguage();});});
-const savedTheme=localStorage.getItem('theme')||'light';
-document.documentElement.className=savedTheme;
 });
 </script>
 </body>
