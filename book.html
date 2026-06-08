@@ -49,6 +49,27 @@
             <a href="index.html" style="color:var(--accent-color);">Главная</a> &rsaquo; <span id="breadcrumbTitle">Книга</span>
         </nav>
         <div id="bookDetail" class="book-detail"></div>
+
+        <!-- Блок пользовательского рейтинга и отзывов -->
+        <section id="userRatingsSection" style="margin-top:40px; display:none;">
+            <h2 data-i18n="ratingsTitle">⭐ Оцените книгу</h2>
+            <div style="margin: 10px 0;">
+                <div id="starRating" style="display:flex; gap:4px; font-size:2rem; cursor:pointer;">
+                    <span data-star="1">☆</span><span data-star="2">☆</span><span data-star="3">☆</span><span data-star="4">☆</span><span data-star="5">☆</span>
+                </div>
+                <button id="submitRating" class="btn btn-primary" style="margin-top:10px;" data-i18n="rateBtn">Оценить</button>
+                <span id="ratingMsg" style="margin-left:12px; color:var(--accent-color);"></span>
+            </div>
+            <h3 style="margin-top:30px;" data-i18n="reviewsTitle">💬 Отзывы</h3>
+            <div id="reviewsList" style="margin:16px 0;"></div>
+            <form id="reviewForm" style="display:flex; flex-direction:column; gap:12px; max-width:500px;">
+                <input type="text" id="reviewName" data-i18n-placeholder="reviewNamePlaceholder" placeholder="Ваше имя" required style="padding:10px; border:1px solid var(--border-color); border-radius:8px; background:var(--card-bg); color:var(--text-color);">
+                <textarea id="reviewText" rows="3" data-i18n-placeholder="reviewTextPlaceholder" placeholder="Напишите отзыв..." required style="padding:10px; border:1px solid var(--border-color); border-radius:8px; background:var(--card-bg); color:var(--text-color);"></textarea>
+                <button type="submit" class="btn btn-outline" style="align-self:flex-start;" data-i18n="submitReview">Отправить отзыв</button>
+            </form>
+            <p id="reviewMsg" style="margin-top:8px; color:var(--accent-color);"></p>
+        </section>
+
         <div style="text-align:center;margin-top:20px;">
             <a href="index.html" class="btn btn-outline" data-i18n="backToHome">На главную</a>
         </div>
@@ -62,28 +83,47 @@
 const STORAGE_KEY='bookvista_';
 let currentLang=localStorage.getItem('lang')||'ru';
 let book=null;
+let userRating = 0;
+let currentBookId = null;
+
 function t(key){return translations[currentLang]?.[key]||key;}
+
 function applyLanguage(){
 document.documentElement.lang=currentLang;
-document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.getAttribute('data-i18n')));
+document.querySelectorAll('[data-i18n]').forEach(el=>{
+    if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') return;
+    el.textContent=t(el.getAttribute('data-i18n'));
+});
+document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+    el.placeholder=t(el.getAttribute('data-i18n-placeholder'));
+});
 document.querySelectorAll('.lang-option').forEach(opt=>opt.classList.toggle('active',opt.dataset.lang===currentLang));
-if(book)updateSEOTags();
+if(book) updateSEOTags();
 }
+
 function updateSEOTags(){
 if(!book)return;
-document.title=book.title+' — '+t('siteName');
+const title = book.title + ' — ' + t('siteName');
+document.title = title;
 document.querySelector('meta[name="description"]').setAttribute('content',(book.description||'').slice(0,160));
 document.querySelector('meta[property="og:title"]').setAttribute('content',book.title);
 document.querySelector('meta[property="og:description"]').setAttribute('content',(book.description||'').slice(0,160));
 document.querySelector('meta[property="og:url"]').setAttribute('content',window.location.href);
 if(book.cover){
-document.querySelector('meta[property="og:image"]')?.remove();
-const metaImage=document.createElement('meta');
-metaImage.setAttribute('property','og:image');
-metaImage.content=book.cover;
-document.head.appendChild(metaImage);
+    document.querySelector('meta[property="og:image"]')?.remove();
+    const metaImage = document.createElement('meta');
+    metaImage.setAttribute('property','og:image');
+    metaImage.content = book.cover;
+    document.head.appendChild(metaImage);
 }
-document.getElementById('breadcrumbTitle').textContent=book.title;
+document.getElementById('breadcrumbTitle').textContent = book.title;
+
+// Определяем итоговый рейтинг: пользовательский, если есть, иначе из Open Library
+const userRatingData = getUserRating();
+let finalRating = book.rating;
+if (userRatingData && userRatingData.count > 0) {
+    finalRating = userRatingData.average.toFixed(1);
+}
 const ld={
   "@context":"https://schema.org",
   "@type":"Book",
@@ -96,30 +136,94 @@ const ld={
     "priceCurrency":"RUB",
     "availability":"https://schema.org/InStock"
   },
-  "aggregateRating": book.rating?{
+  "aggregateRating": finalRating ? {
     "@type":"AggregateRating",
-    "ratingValue":book.rating,
-    "bestRating":"5"
-  }:undefined,
+    "ratingValue":finalRating,
+    "bestRating":"5",
+    "reviewCount": (userRatingData ? userRatingData.count : 0) || 1
+  } : undefined,
   "image":book.cover||undefined
 };
-document.getElementById('bookJsonLd').textContent=JSON.stringify(ld);
+document.getElementById('bookJsonLd').textContent = JSON.stringify(ld);
 }
+
+// Работа с рейтингом
+function getUserRating() {
+    if (!currentBookId) return null;
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY + 'rating_' + currentBookId) || 'null');
+    return data; // { sum, count }
+}
+function saveUserRating(ratingValue) {
+    if (!currentBookId) return;
+    const key = STORAGE_KEY + 'rating_' + currentBookId;
+    let data = JSON.parse(localStorage.getItem(key) || 'null');
+    if (!data) data = { sum: 0, count: 0 };
+    // Проверяем, голосовал ли уже (по куке?)
+    const voted = localStorage.getItem(STORAGE_KEY + 'voted_' + currentBookId);
+    if (voted) return false; // уже голосовал
+    data.sum += ratingValue;
+    data.count += 1;
+    localStorage.setItem(key, JSON.stringify(data));
+    localStorage.setItem(STORAGE_KEY + 'voted_' + currentBookId, '1');
+    return true;
+}
+function getReviews() {
+    if (!currentBookId) return [];
+    return JSON.parse(localStorage.getItem(STORAGE_KEY + 'reviews_' + currentBookId) || '[]');
+}
+function addReview(name, text) {
+    const reviews = getReviews();
+    reviews.unshift({ name, text, date: new Date().toLocaleString('ru-RU') });
+    localStorage.setItem(STORAGE_KEY + 'reviews_' + currentBookId, JSON.stringify(reviews));
+}
+function renderRatingsAndReviews() {
+    const section = document.getElementById('userRatingsSection');
+    if (!currentBookId) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+
+    // Отображаем текущий рейтинг
+    const ratingData = getUserRating();
+    const avg = ratingData ? (ratingData.sum / ratingData.count).toFixed(1) : null;
+    document.getElementById('starRating').querySelectorAll('span').forEach(span => {
+        const star = parseInt(span.dataset.star);
+        span.textContent = star <= userRating ? '★' : '☆';
+    });
+    document.getElementById('ratingMsg').textContent = avg ? `${t('avgRating')}: ${avg} (${ratingData.count})` : '';
+
+    // Отзывы
+    const reviewsList = document.getElementById('reviewsList');
+    const reviews = getReviews();
+    if (!reviews.length) {
+        reviewsList.innerHTML = `<p style="color:var(--muted-color);">${t('noReviews')}</p>`;
+    } else {
+        reviewsList.innerHTML = reviews.map(r => `
+            <div style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:12px; padding:12px; margin-bottom:12px;">
+                <strong style="color:var(--accent-color);">${r.name}</strong> <span style="font-size:0.8rem; color:var(--muted-color);">${r.date}</span>
+                <p style="margin-top:4px; color:var(--text-color);">${r.text}</p>
+            </div>
+        `).join('');
+    }
+}
+
+// Загрузка книги
 async function loadBook(){
 const params=new URLSearchParams(window.location.search);
 const id=params.get('id');
 if(!id)return showError();
+currentBookId = id;
 const directBooks=JSON.parse(localStorage.getItem(STORAGE_KEY+'direct_books')||'[]');
 const directBook=directBooks.find(b=>b.id===id);
-if(directBook){book=mapDirectBook(directBook);renderBook();return;}
+if(directBook){book=mapDirectBook(directBook);renderBook();renderRatingsAndReviews();return;}
 try{
 const resp=await fetch('https://openlibrary.org/works/'+id+'.json');
 if(!resp.ok)throw new Error('Not found');
 const data=await resp.json();
 book=mapOpenLibraryDetail(data,id);
 renderBook();
+renderRatingsAndReviews();
 }catch(e){showError();}
 }
+
 function mapOpenLibraryDetail(data,id){
 const coverUrl=data.covers?`https://covers.openlibrary.org/b/id/${data.covers[0]}-L.jpg`:'';
 let rating = null;
@@ -169,7 +273,14 @@ actionsHTML += `<button class="btn btn-outline" onclick="shareBook('wa')">💬 $
     <button class="btn btn-outline" onclick="shareBook('tg')">✈️ ${t('shareTg')}</button>
     <button class="btn btn-outline" onclick="reportBook()">${t('report')}</button>
     </div>`;
-container.innerHTML='<div class="book-detail-cover" style="position:relative;">'+coverHTML+placeholderHTML+'</div><div class="book-detail-info"><h1>'+book.title+'</h1><div class="book-detail-author">'+book.author+'</div>'+(book.rating?'<p>★ '+book.rating+'</p>':'')+'<p>'+book.description+'</p>'+(book.pages?'<p>📄 '+book.pages+' стр.</p>':'')+(book.publisher?'<p>🏢 '+book.publisher+' ('+book.publishedDate+')</p>':'')+(book.isbn?'<p>🔢 ISBN: '+book.isbn+'</p>':'')+actionsHTML+'</div>';
+
+// Итоговый рейтинг для отображения
+const userRatingData = getUserRating();
+let displayRating = book.rating;
+if (userRatingData && userRatingData.count > 0) {
+    displayRating = (userRatingData.sum / userRatingData.count).toFixed(1);
+}
+container.innerHTML='<div class="book-detail-cover" style="position:relative;">'+coverHTML+placeholderHTML+'</div><div class="book-detail-info"><h1>'+book.title+'</h1><div class="book-detail-author">'+book.author+'</div>'+(displayRating?'<p>★ '+displayRating+'</p>':'')+'<p>'+book.description+'</p>'+(book.pages?'<p>📄 '+book.pages+' стр.</p>':'')+(book.publisher?'<p>🏢 '+book.publisher+' ('+book.publishedDate+')</p>':'')+(book.isbn?'<p>🔢 ISBN: '+book.isbn+'</p>':'')+actionsHTML+'</div>';
 }
 function shareBook(platform){
 if(!book)return;
@@ -180,10 +291,49 @@ else window.open('https://t.me/share/url?url='+url+'&text='+text);
 }
 function reportBook(){alert(t('reportSent'));}
 function showError(){document.getElementById('bookDetail').innerHTML='<p style="text-align:center;padding:40px;">'+t('bookNotFound')+'</p>';}
+
 document.addEventListener('DOMContentLoaded',()=>{
 applyLanguage();
 loadBook();
+
+// Переключение языка
 document.querySelectorAll('.lang-option').forEach(opt=>{opt.addEventListener('click',()=>{currentLang=opt.dataset.lang;localStorage.setItem('lang',currentLang);applyLanguage();});});
+
+// Звёзды рейтинга
+const stars = document.querySelectorAll('#starRating span');
+stars.forEach(star => {
+    star.addEventListener('click', () => {
+        userRating = parseInt(star.dataset.star);
+        renderRatingsAndReviews();
+    });
+});
+document.getElementById('submitRating').addEventListener('click', () => {
+    if (userRating === 0) return;
+    const success = saveUserRating(userRating);
+    if (success) {
+        gtag('event', 'rate_book', { event_category: 'engagement', event_label: book.title, value: userRating });
+        document.getElementById('ratingMsg').textContent = t('thanksRating');
+        renderRatingsAndReviews();
+        updateSEOTags();
+        renderBook(); // обновить отображение рейтинга в деталях
+    } else {
+        document.getElementById('ratingMsg').textContent = t('alreadyVoted');
+    }
+});
+
+// Отзывы
+document.getElementById('reviewForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('reviewName').value.trim();
+    const text = document.getElementById('reviewText').value.trim();
+    if (!name || !text) return;
+    addReview(name, text);
+    gtag('event', 'add_review', { event_category: 'engagement', event_label: book.title });
+    document.getElementById('reviewForm').reset();
+    document.getElementById('reviewMsg').textContent = t('reviewAdded');
+    setTimeout(() => document.getElementById('reviewMsg').textContent = '', 3000);
+    renderRatingsAndReviews();
+});
 });
 </script>
 <script>
