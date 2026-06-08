@@ -118,7 +118,7 @@ if(book.cover){
 }
 document.getElementById('breadcrumbTitle').textContent = book.title;
 
-// Определяем итоговый рейтинг: пользовательский, если есть, иначе из Open Library
+// Итоговый рейтинг
 const userRatingData = getUserRating();
 let finalRating = book.rating;
 if (userRatingData && userRatingData.count > 0) {
@@ -147,20 +147,22 @@ const ld={
 document.getElementById('bookJsonLd').textContent = JSON.stringify(ld);
 }
 
-// Работа с рейтингом
 function getUserRating() {
     if (!currentBookId) return null;
     const data = JSON.parse(localStorage.getItem(STORAGE_KEY + 'rating_' + currentBookId) || 'null');
-    return data; // { sum, count }
+    if (data && data.count > 0) {
+        data.average = data.sum / data.count;
+        return data;
+    }
+    return null;
 }
 function saveUserRating(ratingValue) {
-    if (!currentBookId) return;
+    if (!currentBookId) return false;
     const key = STORAGE_KEY + 'rating_' + currentBookId;
     let data = JSON.parse(localStorage.getItem(key) || 'null');
     if (!data) data = { sum: 0, count: 0 };
-    // Проверяем, голосовал ли уже (по куке?)
     const voted = localStorage.getItem(STORAGE_KEY + 'voted_' + currentBookId);
-    if (voted) return false; // уже голосовал
+    if (voted) return false;
     data.sum += ratingValue;
     data.count += 1;
     localStorage.setItem(key, JSON.stringify(data));
@@ -181,16 +183,14 @@ function renderRatingsAndReviews() {
     if (!currentBookId) { section.style.display = 'none'; return; }
     section.style.display = 'block';
 
-    // Отображаем текущий рейтинг
     const ratingData = getUserRating();
-    const avg = ratingData ? (ratingData.sum / ratingData.count).toFixed(1) : null;
+    const avg = ratingData ? ratingData.average.toFixed(1) : null;
     document.getElementById('starRating').querySelectorAll('span').forEach(span => {
         const star = parseInt(span.dataset.star);
         span.textContent = star <= userRating ? '★' : '☆';
     });
     document.getElementById('ratingMsg').textContent = avg ? `${t('avgRating')}: ${avg} (${ratingData.count})` : '';
 
-    // Отзывы
     const reviewsList = document.getElementById('reviewsList');
     const reviews = getReviews();
     if (!reviews.length) {
@@ -205,7 +205,6 @@ function renderRatingsAndReviews() {
     }
 }
 
-// Загрузка книги
 async function loadBook(){
 const params=new URLSearchParams(window.location.search);
 const id=params.get('id');
@@ -274,11 +273,10 @@ actionsHTML += `<button class="btn btn-outline" onclick="shareBook('wa')">💬 $
     <button class="btn btn-outline" onclick="reportBook()">${t('report')}</button>
     </div>`;
 
-// Итоговый рейтинг для отображения
 const userRatingData = getUserRating();
 let displayRating = book.rating;
 if (userRatingData && userRatingData.count > 0) {
-    displayRating = (userRatingData.sum / userRatingData.count).toFixed(1);
+    displayRating = userRatingData.average.toFixed(1);
 }
 container.innerHTML='<div class="book-detail-cover" style="position:relative;">'+coverHTML+placeholderHTML+'</div><div class="book-detail-info"><h1>'+book.title+'</h1><div class="book-detail-author">'+book.author+'</div>'+(displayRating?'<p>★ '+displayRating+'</p>':'')+'<p>'+book.description+'</p>'+(book.pages?'<p>📄 '+book.pages+' стр.</p>':'')+(book.publisher?'<p>🏢 '+book.publisher+' ('+book.publishedDate+')</p>':'')+(book.isbn?'<p>🔢 ISBN: '+book.isbn+'</p>':'')+actionsHTML+'</div>';
 }
@@ -296,10 +294,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 applyLanguage();
 loadBook();
 
-// Переключение языка
 document.querySelectorAll('.lang-option').forEach(opt=>{opt.addEventListener('click',()=>{currentLang=opt.dataset.lang;localStorage.setItem('lang',currentLang);applyLanguage();});});
 
-// Звёзды рейтинга
 const stars = document.querySelectorAll('#starRating span');
 stars.forEach(star => {
     star.addEventListener('click', () => {
@@ -315,13 +311,12 @@ document.getElementById('submitRating').addEventListener('click', () => {
         document.getElementById('ratingMsg').textContent = t('thanksRating');
         renderRatingsAndReviews();
         updateSEOTags();
-        renderBook(); // обновить отображение рейтинга в деталях
+        renderBook();
     } else {
         document.getElementById('ratingMsg').textContent = t('alreadyVoted');
     }
 });
 
-// Отзывы
 document.getElementById('reviewForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const name = document.getElementById('reviewName').value.trim();
