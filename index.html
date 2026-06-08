@@ -102,13 +102,7 @@
                     <option value="education">Образование</option>
                 </select>
             </div>
-            <div class="filter-group">
-                <label data-i18n="filterLang">Язык</label>
-                <select id="filterLang" class="filter-select">
-                    <option value="" data-i18n="langAny">Любой язык</option>
-                    <option value="rus">Русский</option>
-                </select>
-            </div>
+            <!-- Фильтр языка убран -->
         </div>
     </div>
     <!-- Сортировка -->
@@ -258,15 +252,13 @@ function getSampleBooks(){return [{id:'1',title:'Мастер и Маргари�
 // Сортировка
 function applyFiltersAndSort(){
     const genre=document.getElementById('filterGenre').value;
-    const lang=document.getElementById('filterLang').value;
-    filteredBooks=books.filter(b=>(!genre||b.genre===genre)&&(!lang||b.language===lang));
+    filteredBooks=books.filter(b=>(!genre||b.genre===genre));
     const sortBy=document.getElementById('sortSelect').value;
     if(sortBy==='rating'){
         filteredBooks.sort((a,b)=>(b.rating||0)-(a.rating||0));
     } else if(sortBy==='title'){
         filteredBooks.sort((a,b)=>a.title.localeCompare(b.title));
     } else if(sortBy==='newest'){
-        // предполагаем, что у добавленных книг есть addedAt, у API - first_publish_year
         filteredBooks.sort((a,b)=>{
             const aYear=a.addedAt?a.addedAt.slice(0,4):(a.first_publish_year||0);
             const bYear=b.addedAt?b.addedAt.slice(0,4):(b.first_publish_year||0);
@@ -350,7 +342,6 @@ function setupEventListeners(){
 document.getElementById('searchButton').addEventListener('click',()=>{currentQuery=document.getElementById('searchInput').value.trim();if(currentQuery)searchBooks(currentQuery);});
 document.getElementById('searchInput').addEventListener('keypress',(e)=>{if(e.key==='Enter'){currentQuery=e.target.value.trim();if(currentQuery)searchBooks(currentQuery);}});
 document.getElementById('filterGenre').addEventListener('change',()=>{applyFiltersAndSort();});
-document.getElementById('filterLang').addEventListener('change',()=>{applyFiltersAndSort();});
 document.getElementById('sortSelect').addEventListener('change',()=>{applyFiltersAndSort();});
 document.getElementById('subBtn').addEventListener('click',()=>{const email=document.getElementById('subEmail').value.trim();if(email)subscribe(email);});
 document.querySelectorAll('.lang-option').forEach(opt=>{opt.addEventListener('click',()=>{currentLang=opt.dataset.lang;localStorage.setItem('lang',currentLang);applyLanguage();});});
