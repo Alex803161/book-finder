@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Блог — BookVista</title>
     <meta name="description" content="Подборки книг и обзоры. Найдите свою идеальную книгу.">
+    <meta property="og:title" content="Блог BookVista — подборки и обзоры">
+    <meta property="og:description" content="Тематические подборки книг, обзоры новинок и советы по чтению.">
+    <meta property="og:url" content="https://alex803161.github.io/book-finder/blog.html">
     <link rel="canonical" href="https://alex803161.github.io/book-finder/blog.html">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
     <link rel="stylesheet" href="style.css">
@@ -28,28 +31,57 @@
         </div>
     </div>
     <main style="margin-top:30px;">
+        <!-- Хлебные крошки -->
+        <nav aria-label="Breadcrumb" style="margin-bottom:16px;font-size:0.9rem;color:var(--muted-color);">
+            <a href="index.html" style="color:var(--accent-color);">Главная</a> &rsaquo; <span>Блог</span>
+        </nav>
         <h1 class="page-title">📖 Блог BookVista</h1>
         <p style="text-align:center; color:var(--muted-color); margin-bottom:30px;">Подборки, обзоры и рекомендации книг для уютного чтения</p>
         <div class="blog-grid">
-            <article class="blog-card">
-                <h2>📚 10 книг, которые стоит прочитать этой осенью</h2>
+            <!-- Статья 1 -->
+            <article class="blog-card" itemscope itemtype="https://schema.org/Article">
+                <meta itemprop="url" content="https://alex803161.github.io/book-finder/blog.html#article1">
+                <meta itemprop="datePublished" content="2026-06-08">
+                <meta itemprop="author" content="BookVista">
+                <h2 itemprop="headline">📚 10 книг, которые стоит прочитать этой осенью</h2>
                 <p class="blog-meta">8 июня 2026</p>
-                <p>Тёплые и атмосферные истории для длинных вечеров. От классики до современных бестселлеров.</p>
+                <p itemprop="description">Тёплые и атмосферные истории для длинных вечеров. От классики до современных бестселлеров.</p>
                 <a href="#" class="btn btn-outline">Читать →</a>
             </article>
-            <article class="blog-card">
-                <h2>🔍 Как выбрать книгу под настроение: гид по жанрам</h2>
+            <!-- Статья 2 -->
+            <article class="blog-card" itemscope itemtype="https://schema.org/Article">
+                <meta itemprop="url" content="https://alex803161.github.io/book-finder/blog.html#article2">
+                <meta itemprop="datePublished" content="2026-06-05">
+                <meta itemprop="author" content="BookVista">
+                <h2 itemprop="headline">🔍 Как выбрать книгу под настроение: гид по жанрам</h2>
                 <p class="blog-meta">5 июня 2026</p>
-                <p>Фэнтези, детективы, романы или научпоп — поможем найти идеальную книгу под ваш запрос.</p>
+                <p itemprop="description">Фэнтези, детективы, романы или научпоп — поможем найти идеальную книгу под ваш запрос.</p>
                 <a href="#" class="btn btn-outline">Читать →</a>
             </article>
-            <article class="blog-card">
-                <h2>👶 Детские книги, которые понравятся и взрослым</h2>
+            <!-- Статья 3 -->
+            <article class="blog-card" itemscope itemtype="https://schema.org/Article">
+                <meta itemprop="url" content="https://alex803161.github.io/book-finder/blog.html#article3">
+                <meta itemprop="datePublished" content="2026-06-01">
+                <meta itemprop="author" content="BookVista">
+                <h2 itemprop="headline">👶 Детские книги, которые понравятся и взрослым</h2>
                 <p class="blog-meta">1 июня 2026</p>
-                <p>Совместное чтение с детьми может быть увлекательным и для родителей. Наши рекомендации.</p>
+                <p itemprop="description">Совместное чтение с детьми может быть увлекательным и для родителей. Наши рекомендации.</p>
                 <a href="#" class="btn btn-outline">Читать →</a>
             </article>
         </div>
+
+        <!-- Локальные комментарии -->
+        <section style="margin-top:50px;" id="commentsSection">
+            <h2>💬 Комментарии</h2>
+            <div id="commentsList" style="margin:16px 0;"></div>
+            <form id="commentForm" style="display:flex; flex-direction:column; gap:12px; max-width:500px;">
+                <input type="text" id="commentName" placeholder="Ваше имя" required style="padding:10px; border:1px solid var(--border-color); border-radius:8px; background:var(--card-bg); color:var(--text-color);">
+                <textarea id="commentText" rows="3" placeholder="Напишите комментарий..." required style="padding:10px; border:1px solid var(--border-color); border-radius:8px; background:var(--card-bg); color:var(--text-color);"></textarea>
+                <button type="submit" class="btn btn-primary" style="align-self:flex-start;">Отправить</button>
+            </form>
+            <p id="commentMsg" style="margin-top:8px; color:var(--accent-color);"></p>
+        </section>
+
         <div style="text-align:center; margin-top:30px;">
             <a href="index.html" class="btn btn-outline">← На главную</a>
         </div>
@@ -60,9 +92,45 @@
 </div>
 <script src="translations.js"></script>
 <script>
-    // Применяем сохранённую тему
-    const savedTheme=localStorage.getItem('theme')||'light';
-    document.documentElement.className=savedTheme;
+// --- Комментарии (локальное хранилище) ---
+const COMMENT_KEY = 'bookvista_blog_comments';
+function loadComments(){
+    const comments = JSON.parse(localStorage.getItem(COMMENT_KEY)||'[]');
+    const container = document.getElementById('commentsList');
+    if(!comments.length){
+        container.innerHTML = '<p style="color:var(--muted-color);">Пока нет комментариев. Будьте первым!</p>';
+        return;
+    }
+    container.innerHTML = comments.map(c => `
+        <div class="comment" style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:12px; padding:12px; margin-bottom:12px;">
+            <strong style="color:var(--accent-color);">${c.name}</strong> <span style="font-size:0.8rem; color:var(--muted-color);">${c.date}</span>
+            <p style="margin-top:4px; color:var(--text-color);">${c.text}</p>
+        </div>
+    `).join('');
+}
+document.getElementById('commentForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const name = document.getElementById('commentName').value.trim();
+    const text = document.getElementById('commentText').value.trim();
+    if(!name || !text) return;
+    const comments = JSON.parse(localStorage.getItem(COMMENT_KEY)||'[]');
+    comments.unshift({
+        name: name,
+        text: text,
+        date: new Date().toLocaleString('ru-RU')
+    });
+    localStorage.setItem(COMMENT_KEY, JSON.stringify(comments));
+    document.getElementById('commentForm').reset();
+    document.getElementById('commentMsg').textContent = 'Комментарий добавлен!';
+    setTimeout(() => document.getElementById('commentMsg').textContent = '', 3000);
+    loadComments();
+});
+// Загружаем комментарии при старте
+loadComments();
+
+// Применяем сохранённую тему
+const savedTheme=localStorage.getItem('theme')||'light';
+document.documentElement.className=savedTheme;
 </script>
 </body>
 </html>
