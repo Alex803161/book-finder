@@ -2,6 +2,18 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'light';
+      document.documentElement.className = theme;
+      const font = localStorage.getItem('font');
+      if (font) document.documentElement.style.setProperty('--font-family', font);
+      const fontSize = localStorage.getItem('fontSize');
+      if (fontSize) document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+      const textColor = localStorage.getItem('textColor');
+      if (textColor) document.documentElement.style.setProperty('--text-color', textColor);
+    })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>BookVista — уютная книжная полка</title>
     <meta name="description" content="Найдите свою следующую книгу. Бесплатные и платные издания, читайте с комфортом.">
@@ -104,7 +116,6 @@
             </div>
         </div>
     </div>
-    <!-- Сортировка -->
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <div class="results-header">
             <div class="counter"><span data-i18n="foundPrefix">Найдено:</span> <span id="totalBooks">0</span></div>
@@ -117,7 +128,6 @@
         </select>
     </div>
     <div id="booksContainer" class="books-list"></div>
-    <!-- Пагинация -->
     <div id="pagination" class="pagination"></div>
     <div style="text-align:center; margin: 30px 0; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
         <a href="favorites.html" class="btn btn-outline" data-i18n="favorites">Избранное</a>
@@ -191,7 +201,6 @@ document.documentElement.style.setProperty('--text-color',savedColor);
 document.querySelectorAll('.color-dot').forEach(dot=>{dot.classList.toggle('active',dot.dataset.color===savedColor);dot.addEventListener('click',()=>{document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('active'));dot.classList.add('active');document.documentElement.style.setProperty('--text-color',dot.dataset.color);localStorage.setItem('textColor',dot.dataset.color);});});
 }
 function setTheme(theme){document.documentElement.className=theme;localStorage.setItem('theme',theme);document.getElementById('themeLight').classList.toggle('active',theme==='light');document.getElementById('themeDark').classList.toggle('active',theme==='dark');}
-// Интеграция добавленных книг
 function getDirectBooks(){
     return JSON.parse(localStorage.getItem(STORAGE_KEY+'direct_books')||'[]').map(b=>({
         ...b,
@@ -202,7 +211,7 @@ function getDirectBooks(){
 }
 async function loadInitialBooks(){
 try{
-const resp=await fetch(OPENLIBRARY_API+'?q=subject:fiction&limit=100');   // 100 книг
+const resp=await fetch(OPENLIBRARY_API+'?q=subject:fiction&limit=100');
 if(!resp.ok)throw new Error('API error');
 const data=await resp.json();
 const directBooks=getDirectBooks();
@@ -249,7 +258,6 @@ isFree: false
 };
 }
 function getSampleBooks(){return [{id:'1',title:'Мастер и Маргарита',author:'М. Булгаков',genre:'fiction',language:'rus',rating:4.8,price:null,cover:'',buyLink:'https://www.litres.ru/search/?q=Мастер+и+Маргарита',isFree:false},{id:'2',title:'1984',author:'Дж. Оруэлл',genre:'fantasy',language:'eng',rating:4.6,price:null,cover:'',buyLink:'https://www.litres.ru/search/?q=1984',isFree:false},{id:'3',title:'Sapiens',author:'Ю. Н. Харари',genre:'nonfiction',language:'eng',rating:4.7,price:null,cover:'',buyLink:'https://www.litres.ru/search/?q=Sapiens',isFree:false},{id:'4',title:'Убийство в Восточном экспрессе',author:'А. Кристи',genre:'mystery',language:'rus',rating:4.5,price:null,cover:'',buyLink:'https://www.litres.ru/search/?q=Убийство+в+Восточном+экспрессе',isFree:false}];}
-// Сортировка
 function applyFiltersAndSort(){
     const genre=document.getElementById('filterGenre').value;
     filteredBooks=books.filter(b=>(!genre||b.genre===genre));
@@ -299,7 +307,6 @@ grid.innerHTML=toShow.map(book=>{
         </div>
     </div>`;
 }).join('');
-// Пагинация
 const totalPages=Math.ceil(filteredBooks.length/itemsPerPage);
 let paginationHTML='';
 if(totalPages>1){
