@@ -150,7 +150,7 @@
 <script>
 const STORAGE_KEY='bookvista_';
 let currentLang=localStorage.getItem('lang')||'ru';
-let books=[],filteredBooks=[],displayCount=12,currentQuery='';
+let books=[],filteredBooks=[],displayCount=40,currentQuery='';   // увеличено до 40
 const OPENLIBRARY_API='https://openlibrary.org/search.json';
 document.addEventListener('DOMContentLoaded',()=>{applyLanguage();loadInitialBooks();setupEventListeners();setupSettingsPanel();});
 function t(key){return translations[currentLang]?.[key]||key;}
@@ -191,7 +191,7 @@ document.querySelectorAll('.color-dot').forEach(dot=>{dot.classList.toggle('acti
 function setTheme(theme){document.documentElement.className=theme;localStorage.setItem('theme',theme);document.getElementById('themeLight').classList.toggle('active',theme==='light');document.getElementById('themeDark').classList.toggle('active',theme==='dark');}
 async function loadInitialBooks(){
 try{
-const resp=await fetch(OPENLIBRARY_API+'?q=subject:fiction&limit=20');
+const resp=await fetch(OPENLIBRARY_API+'?q=subject:fiction&limit=40');   // 40 книг
 if(!resp.ok)throw new Error('API error');
 const data=await resp.json();
 books=(data.docs||[]).map(mapOpenLibraryBook);
@@ -217,6 +217,12 @@ function mapOpenLibraryBook(doc){
 const coverId=doc.cover_i;
 const coverUrl=coverId?`https://covers.openlibrary.org/b/id/${coverId}-M.jpg`:'';
 const lang = (doc.language && doc.language.length) ? doc.language[0].toLowerCase() : 'eng';
+// Рейтинг из API, если есть
+let rating = null;
+if (doc.ratings_average) {
+    rating = parseFloat(doc.ratings_average).toFixed(1);
+}
+// Если рейтинга нет, не выводим его (оставим null)
 return {
 id: doc.key.replace('/works/','')||doc.cover_edition_key||doc.key,
 title: doc.title||'Без названия',
@@ -225,7 +231,7 @@ genre: (doc.subject||['fiction'])[0].toLowerCase(),
 language: lang,
 cover: coverUrl,
 description: (doc.first_sentence||[]).slice(0,3).join(' ')||'Описание отсутствует.',
-rating: (Math.random()*2+3).toFixed(1),
+rating: rating,
 price: null,
 buyLink: `https://www.litres.ru/search/?q=${encodeURIComponent(doc.title)}`,
 isFree: false
@@ -237,7 +243,7 @@ const grid=document.getElementById('booksContainer');
 const toShow=filteredBooks.slice(0,displayCount);
 document.getElementById('totalBooks').textContent=filteredBooks.length;
 if(!toShow.length){grid.innerHTML='<p style="grid-column:1/-1;text-align:center;" class="no-results-text">'+t('noResults')+'</p>';document.getElementById('loadMoreBtn').style.display='none';return;}
-grid.innerHTML=toShow.map(book=>'<div class="book-card" onclick="openBook(\''+book.id+'\')"><div class="book-cover" style="'+(book.cover?'background-image:url('+book.cover+');background-size:cover;':'')+'">'+(book.cover?'':'📚')+'</div><div class="book-info" style="flex:1;display:flex;flex-direction:column;gap:4px;"><div class="book-title">'+book.title+'</div><div class="book-author">'+book.author+'</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto;font-size:0.8rem;"><span>★ '+book.rating+'</span><span style="font-weight:700;color:var(--accent-color);">'+t('buy')+'</span></div></div><div class="book-actions" onclick="event.stopPropagation();"><button class="save-btn'+(isFavorite(book.id)?' saved':'')+'" onclick="toggleFavorite(\''+book.id+'\')" title="'+(isFavorite(book.id)?t('removeFav'):t('addFav'))+'">'+(isFavorite(book.id)?'❤️':'🤍')+'</button><a href="'+book.buyLink+'" target="_blank" class="btn-buy">'+t('buy')+'</a></div></div>').join('');
+grid.innerHTML=toShow.map(book=>'<div class="book-card" onclick="openBook(\''+book.id+'\')"><div class="book-cover" style="'+(book.cover?'background-image:url('+book.cover+');background-size:cover;':'')+'">'+(book.cover?'':'📚')+'</div><div class="book-info" style="flex:1;display:flex;flex-direction:column;gap:4px;"><div class="book-title">'+book.title+'</div><div class="book-author">'+book.author+'</div>'+(book.rating?'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto;font-size:0.8rem;"><span>★ '+book.rating+'</span></div>':'')+'<div class="book-actions" onclick="event.stopPropagation();" style="margin-top:8px;"><button class="save-btn'+(isFavorite(book.id)?' saved':'')+'" onclick="toggleFavorite(\''+book.id+'\')" title="'+(isFavorite(book.id)?t('removeFav'):t('addFav'))+'">'+(isFavorite(book.id)?'❤️':'🤍')+'</button><a href="'+book.buyLink+'" target="_blank" class="btn-buy">'+t('buy')+'</a></div></div>').join('');
 document.getElementById('loadMoreBtn').style.display=filteredBooks.length>displayCount?'inline-flex':'none';
 renderRecent();
 }
@@ -253,7 +259,7 @@ const recent=JSON.parse(localStorage.getItem(STORAGE_KEY+'recent')||'[]');
 localStorage.setItem(STORAGE_KEY+'recent',JSON.stringify(recent.filter(r=>r.id!==id)));
 renderRecent();
 }
-function applyFilters(){const genre=document.getElementById('filterGenre').value;const lang=document.getElementById('filterLang').value;filteredBooks=books.filter(b=>(!genre||b.genre===genre)&&(!lang||b.language===lang));displayCount=12;renderBooks();}
+function applyFilters(){const genre=document.getElementById('filterGenre').value;const lang=document.getElementById('filterLang').value;filteredBooks=books.filter(b=>(!genre||b.genre===genre)&&(!lang||b.language===lang));displayCount=40;renderBooks();}
 function getFavorites(){return JSON.parse(localStorage.getItem(STORAGE_KEY+'fav')||'[]');}
 function isFavorite(id){return getFavorites().some(f=>f.id===id);}
 function toggleFavorite(id){const favs=getFavorites();const book=books.find(b=>b.id===id);if(!book)return;const idx=favs.findIndex(f=>f.id===id);if(idx>-1)favs.splice(idx,1);else favs.push({id:book.id,title:book.title,author:book.author,rating:book.rating,price:book.price,cover:book.cover});localStorage.setItem(STORAGE_KEY+'fav',JSON.stringify(favs));renderBooks();}
@@ -267,7 +273,7 @@ document.getElementById('searchButton').addEventListener('click',()=>{currentQue
 document.getElementById('searchInput').addEventListener('keypress',(e)=>{if(e.key==='Enter'){currentQuery=e.target.value.trim();if(currentQuery)searchBooks(currentQuery);}});
 document.getElementById('filterGenre').addEventListener('change',()=>{applyFilters();});
 document.getElementById('filterLang').addEventListener('change',()=>{applyFilters();});
-document.getElementById('loadMoreBtn').addEventListener('click',()=>{displayCount+=12;renderBooks();});
+document.getElementById('loadMoreBtn').addEventListener('click',()=>{displayCount+=40;renderBooks();});
 document.getElementById('subBtn').addEventListener('click',()=>{const email=document.getElementById('subEmail').value.trim();if(email)subscribe(email);});
 document.querySelectorAll('.lang-option').forEach(opt=>{opt.addEventListener('click',()=>{currentLang=opt.dataset.lang;localStorage.setItem('lang',currentLang);applyLanguage();});});
 renderSavedSearches();renderRecent();
