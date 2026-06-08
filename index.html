@@ -302,7 +302,7 @@ grid.innerHTML=toShow.map(book=>{
             ${ratingHTML}
             <div class="book-actions" onclick="event.stopPropagation();" style="margin-top:8px;">
                 <button class="save-btn${isFavorite(book.id)?' saved':''}" onclick="toggleFavorite('${book.id}')" title="${isFavorite(book.id)?t('removeFav'):t('addFav')}">${isFavorite(book.id)?'❤️':'🤍'}</button>
-                <a href="${book.buyLink}" target="_blank" class="btn-buy">${t('buy')}</a>
+                <a href="${book.buyLink}" target="_blank" class="btn-buy" onclick="gtag('event', 'click', { event_category: 'outbound', event_label: 'buy_button', value: '${book.title}' });">${t('buy')}</a>
             </div>
         </div>
     </div>`;
@@ -339,12 +339,36 @@ renderRecent();
 }
 function getFavorites(){return JSON.parse(localStorage.getItem(STORAGE_KEY+'fav')||'[]');}
 function isFavorite(id){return getFavorites().some(f=>f.id===id);}
-function toggleFavorite(id){const favs=getFavorites();const book=books.find(b=>b.id===id);if(!book)return;const idx=favs.findIndex(f=>f.id===id);if(idx>-1)favs.splice(idx,1);else favs.push({id:book.id,title:book.title,author:book.author,rating:book.rating,price:book.price,cover:book.cover});localStorage.setItem(STORAGE_KEY+'fav',JSON.stringify(favs));renderBooks();}
+function toggleFavorite(id){
+    const favs=getFavorites();
+    const book=books.find(b=>b.id===id);
+    if(!book)return;
+    const idx=favs.findIndex(f=>f.id===id);
+    if(idx>-1){
+        favs.splice(idx,1);
+        gtag('event', 'remove_from_favorites', { event_category: 'engagement', event_label: book.title });
+    } else {
+        favs.push({id:book.id,title:book.title,author:book.author,rating:book.rating,price:book.price,cover:book.cover});
+        gtag('event', 'add_to_favorites', { event_category: 'engagement', event_label: book.title });
+    }
+    localStorage.setItem(STORAGE_KEY+'fav',JSON.stringify(favs));
+    renderBooks();
+}
 function openBook(id){const book=books.find(b=>b.id===id);if(!book)return;const recent=JSON.parse(localStorage.getItem(STORAGE_KEY+'recent')||'[]');const filtered=recent.filter(r=>r.id!==id);filtered.unshift({id:book.id,title:book.title,author:book.author});localStorage.setItem(STORAGE_KEY+'recent',JSON.stringify(filtered.slice(0,20)));window.location.href='book.html?id='+id;}
 function saveSearch(query){const searches=JSON.parse(localStorage.getItem(STORAGE_KEY+'searches')||'[]');if(!searches.includes(query)){searches.unshift(query);localStorage.setItem(STORAGE_KEY+'searches',JSON.stringify(searches.slice(0,10)));renderSavedSearches();}}
 function deleteSearch(query){const searches=JSON.parse(localStorage.getItem(STORAGE_KEY+'searches')||'[]');localStorage.setItem(STORAGE_KEY+'searches',JSON.stringify(searches.filter(s=>s!==query)));renderSavedSearches();}
 function renderSavedSearches(){const searches=JSON.parse(localStorage.getItem(STORAGE_KEY+'searches')||'[]');const container=document.getElementById('savedSearchesList');if(!container)return;container.innerHTML=searches.map(s=>'<span style="display:inline-flex;align-items:center;gap:4px;"><button class="btn btn-outline" style="font-size:0.85rem;" onclick="document.getElementById(\'searchInput\').value=\''+s+'\';searchBooks(\''+s+'\')">'+s+'</button><button class="btn-close-settings" style="width:20px;height:20px;font-size:0.7rem;" onclick="deleteSearch(\''+s+'\')">✕</button></span>').join('');}
-function subscribe(email){const subs=JSON.parse(localStorage.getItem(STORAGE_KEY+'subs')||'[]');if(subs.includes(email)){document.getElementById('subMsg').textContent=t('subscriptionExists');return;}subs.push(email);localStorage.setItem(STORAGE_KEY+'subs',JSON.stringify(subs));document.getElementById('subMsg').textContent=t('subscriptionSuccess');}
+function subscribe(email){
+    const subs=JSON.parse(localStorage.getItem(STORAGE_KEY+'subs')||'[]');
+    if(subs.includes(email)){
+        document.getElementById('subMsg').textContent=t('subscriptionExists');
+        return;
+    }
+    subs.push(email);
+    localStorage.setItem(STORAGE_KEY+'subs',JSON.stringify(subs));
+    document.getElementById('subMsg').textContent=t('subscriptionSuccess');
+    gtag('event', 'subscribe', { event_category: 'engagement', event_label: email });
+}
 function setupEventListeners(){
 document.getElementById('searchButton').addEventListener('click',()=>{currentQuery=document.getElementById('searchInput').value.trim();if(currentQuery)searchBooks(currentQuery);});
 document.getElementById('searchInput').addEventListener('keypress',(e)=>{if(e.key==='Enter'){currentQuery=e.target.value.trim();if(currentQuery)searchBooks(currentQuery);}});
@@ -353,6 +377,15 @@ document.getElementById('sortSelect').addEventListener('change',()=>{applyFilter
 document.getElementById('subBtn').addEventListener('click',()=>{const email=document.getElementById('subEmail').value.trim();if(email)subscribe(email);});
 document.querySelectorAll('.lang-option').forEach(opt=>{opt.addEventListener('click',()=>{currentLang=opt.dataset.lang;localStorage.setItem('lang',currentLang);applyLanguage();});});
 renderSavedSearches();renderRecent();
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/book-finder/sw.js')
+      .then(reg => console.log('SW registered'))
+      .catch(err => console.log('SW fail', err));
+  });
 }
 </script>
 </body>
