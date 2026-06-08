@@ -242,14 +242,14 @@ html.dark input:focus, html.dark textarea:focus { box-shadow: 0 0 0 3px rgba(212
 textarea { border-radius: 14px; resize: vertical; min-height: 100px; }
 .subscribe-section { background: var(--card-bg); border-radius: 20px; padding: 24px; margin: 30px 0; border: 1px solid var(--border-color); box-shadow: var(--card-shadow); }
 .subscribe-section h3 { color: var(--text-color); text-shadow: var(--text-shadow-light); }
-/* Футер – кремовый текст в тёмной теме */
+/* Футер – цвет "кофе с молоком" в тёмной теме */
 .site-footer {
   margin-top: 40px; padding: 20px 0; text-align: center;
   color: var(--muted-color); border-top: 1px solid var(--border-color);
   text-shadow: 0 1px 2px rgba(255,255,255,0.5);
 }
 html.dark .site-footer {
-  color: #FFF8E7;   /* кремовый, как названия книг */
+  color: #D2B48C;   /* кофе с молоком */
   text-shadow: 0 1px 3px rgba(0,0,0,0.7);
 }
 .site-footer a { color: var(--accent-color); text-decoration: none; }
