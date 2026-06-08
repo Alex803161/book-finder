@@ -91,7 +91,8 @@ const translations = {
     submitReview: "Отправить отзыв",
     thanksRating: "Спасибо за оценку!",
     alreadyVoted: "Вы уже оценили эту книгу.",
-    reviewAdded: "Отзыв добавлен!"
+    reviewAdded: "Отзыв добавлен!",
+    similarBooks: "📚 Похожие книги"
   },
   en: {
     siteName: "BookVista",
@@ -185,6 +186,7 @@ const translations = {
     submitReview: "Submit review",
     thanksRating: "Thanks for your rating!",
     alreadyVoted: "You have already voted.",
-    reviewAdded: "Review added!"
+    reviewAdded: "Review added!",
+    similarBooks: "📚 Similar Books"
   }
 };
