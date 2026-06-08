@@ -80,7 +80,18 @@ const translations = {
     noDirectBooks: "Нет добавленных книг",
     deleteBtn: "Удалить",
     bookNotFound: "Книга не найдена.",
-    backToHome: "На главную"
+    backToHome: "На главную",
+    ratingsTitle: "⭐ Оцените книгу",
+    rateBtn: "Оценить",
+    avgRating: "Средняя оценка",
+    noReviews: "Пока нет отзывов. Будьте первым!",
+    reviewsTitle: "💬 Отзывы",
+    reviewNamePlaceholder: "Ваше имя",
+    reviewTextPlaceholder: "Напишите отзыв...",
+    submitReview: "Отправить отзыв",
+    thanksRating: "Спасибо за оценку!",
+    alreadyVoted: "Вы уже оценили эту книгу.",
+    reviewAdded: "Отзыв добавлен!"
   },
   en: {
     siteName: "BookVista",
@@ -163,6 +174,17 @@ const translations = {
     noDirectBooks: "No added books",
     deleteBtn: "Delete",
     bookNotFound: "Book not found.",
-    backToHome: "Back to Home"
+    backToHome: "Back to Home",
+    ratingsTitle: "⭐ Rate this book",
+    rateBtn: "Rate",
+    avgRating: "Average rating",
+    noReviews: "No reviews yet. Be the first!",
+    reviewsTitle: "💬 Reviews",
+    reviewNamePlaceholder: "Your name",
+    reviewTextPlaceholder: "Write a review...",
+    submitReview: "Submit review",
+    thanksRating: "Thanks for your rating!",
+    alreadyVoted: "You have already voted.",
+    reviewAdded: "Review added!"
   }
 };
