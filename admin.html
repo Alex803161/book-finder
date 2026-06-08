@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="robots" content="noindex">
+    <title>Управление — BookVista</title>
+    <link rel="canonical" href="https://alex803161.github.io/book-finder/admin.html">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light">
+<div class="container">
+    <div class="top-bar">
+        <a href="index.html" style="text-decoration:none;color:var(--accent-color);font-weight:700;font-size:1.2rem;">📚 BookVista</a>
+        <div class="lang-switch" id="langSwitch">
+            <span class="lang-option active" data-lang="ru">🇷🇺</span>
+            <span class="lang-option" data-lang="en">🇬🇧</span>
+        </div>
+    </div>
+    <main style="margin-top:30px;">
+        <h1 data-i18n="adminTitle" style="margin-bottom:20px;">Управление прямыми книгами</h1>
+        <div id="adminList" class="books-list"></div>
+        <p id="adminMsg" data-i18n="noDirectBooks" style="text-align:center;padding:40px;">Нет добавленных книг</p>
+        <div style="text-align:center;margin-top:20px;">
+            <a href="index.html" class="btn btn-outline" data-i18n="backToHome">На главную</a>
+        </div>
+    </main>
+    <footer class="site-footer">
+        <p data-i18n="footerText">© 2025 BookVista — уютная книжная полка</p>
+    </footer>
+</div>
+<script src="translations.js"></script>
+<script>
+const STORAGE_KEY='bookvista_';
+const ADMIN_PASSWORD='bookvista2025';
+let currentLang=localStorage.getItem('lang')||'ru';
+function t(k){return translations[currentLang]?.[k]||k;}
+function applyLanguage(){
+document.documentElement.lang=currentLang;
+document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.getAttribute('data-i18n')));
+document.querySelectorAll('.lang-option').forEach(opt=>opt.classList.toggle('active',opt.dataset.lang===currentLang));
+renderAdmin();
+}
+function renderAdmin(){
+const books=JSON.parse(localStorage.getItem(STORAGE_KEY+'direct_books')||'[]');
+document.getElementById('adminMsg').style.display=books.length?'none':'block';
+document.getElementById('adminList').innerHTML=books.map(b=>'<div class="book-card"><div class="book-cover">📚</div><div class="book-title">'+b.title+'</div><div class="book-author">'+b.author+'</div><div class="book-actions" style="margin-top:8px;"><button class="btn btn-outline" onclick="deleteBook(\''+b.id+'\')" style="font-size:0.8rem;">'+t('deleteBtn')+'</button></div></div>').join('');
+}
+function deleteBook(id){
+if(!confirm('Удалить книгу?'))return;
+const books=JSON.parse(localStorage.getItem(STORAGE_KEY+'direct_books')||'[]');
+localStorage.setItem(STORAGE_KEY+'direct_books',JSON.stringify(books.filter(b=>b.id!==id)));
+renderAdmin();
+}
+function checkPassword(){
+const savedPass=localStorage.getItem('admin_pass');
+if(savedPass===ADMIN_PASSWORD)return true;
+const pass=prompt('Введите пароль администратора:');
+if(pass===ADMIN_PASSWORD){localStorage.setItem('admin_pass',ADMIN_PASSWORD);return true;}
+else{alert('Неверный пароль');window.location.href='index.html';return false;}
+}
+document.addEventListener('DOMContentLoaded',()=>{
+if(!checkPassword())return;
+applyLanguage();
+document.querySelectorAll('.lang-option').forEach(opt=>{opt.addEventListener('click',()=>{currentLang=opt.dataset.lang;localStorage.setItem('lang',currentLang);applyLanguage();});});
+const savedTheme=localStorage.getItem('theme')||'light';
+document.documentElement.className=savedTheme;
+});
+</script>
+</body>
+</html>

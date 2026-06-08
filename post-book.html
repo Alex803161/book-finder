@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Добавить книгу — BookVista</title>
+    <meta name="robots" content="noindex">
+    <link rel="canonical" href="https://alex803161.github.io/book-finder/post-book.html">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body class="light">
+<div class="container">
+    <div class="top-bar">
+        <a href="index.html" style="text-decoration:none;color:var(--accent-color);font-weight:700;font-size:1.2rem;">📚 BookVista</a>
+        <div class="lang-switch" id="langSwitch">
+            <span class="lang-option active" data-lang="ru">🇷🇺</span>
+            <span class="lang-option" data-lang="en">🇬🇧</span>
+        </div>
+    </div>
+    <main style="margin-top:30px;max-width:600px;">
+        <h1 data-i18n="addBookTitle" style="margin-bottom:20px;">Добавить книгу в каталог</h1>
+        <form id="addBookForm" style="display:flex;flex-direction:column;gap:16px;">
+            <input type="text" id="title" data-i18n-placeholder="bookTitleLabel" placeholder="Название книги" required>
+            <input type="text" id="author" data-i18n-placeholder="authorLabel" placeholder="Автор" required>
+            <select id="genre" class="filter-select">
+                <option value="fiction">Художественная литература</option>
+                <option value="nonfiction">Документальная проза</option>
+                <option value="fantasy">Фэнтези</option>
+                <option value="mystery">Детективы и триллеры</option>
+                <option value="science">Наука и технологии</option>
+                <option value="history">История</option>
+                <option value="biography">Биографии и мемуары</option>
+            </select>
+            <input type="number" id="price" data-i18n-placeholder="priceLabel" placeholder="Цена (руб.)" min="0">
+            <input type="url" id="cover" data-i18n-placeholder="coverUrlLabel" placeholder="Ссылка на обложку">
+            <textarea id="description" rows="4" data-i18n-placeholder="descriptionLabel" placeholder="Описание"></textarea>
+            <button type="submit" class="btn btn-primary" data-i18n="saveBtn">Сохранить</button>
+        </form>
+        <p id="formMsg" style="margin-top:12px;color:var(--accent-color);"></p>
+        <div style="text-align:center;margin-top:20px;">
+            <a href="index.html" class="btn btn-outline" data-i18n="backToHome">На главную</a>
+        </div>
+    </main>
+    <footer class="site-footer">
+        <p data-i18n="footerText">© 2025 BookVista — уютная книжная полка</p>
+    </footer>
+</div>
+<script src="translations.js"></script>
+<script>
+const STORAGE_KEY='bookvista_';
+let currentLang=localStorage.getItem('lang')||'ru';
+function t(k){return translations[currentLang]?.[k]||k;}
+function applyLanguage(){
+document.documentElement.lang=currentLang;
+document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.getAttribute('data-i18n')));
+document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>el.placeholder=t(el.getAttribute('data-i18n-placeholder')));
+document.querySelectorAll('.lang-option').forEach(opt=>opt.classList.toggle('active',opt.dataset.lang===currentLang));
+}
+document.addEventListener('DOMContentLoaded',()=>{
+applyLanguage();
+document.getElementById('addBookForm').addEventListener('submit',e=>{
+e.preventDefault();
+const book={
+id:'direct_'+Date.now(),
+title:document.getElementById('title').value.trim(),
+author:document.getElementById('author').value.trim(),
+genre:document.getElementById('genre').value,
+price:parseInt(document.getElementById('price').value)||0,
+cover:document.getElementById('cover').value.trim(),
+description:document.getElementById('description').value.trim(),
+language:currentLang,
+addedAt:new Date().toISOString()
+};
+const direct=JSON.parse(localStorage.getItem(STORAGE_KEY+'direct_books')||'[]');
+direct.push(book);
+localStorage.setItem(STORAGE_KEY+'direct_books',JSON.stringify(direct));
+document.getElementById('formMsg').textContent='Книга добавлена!';
+e.target.reset();
+});
+document.querySelectorAll('.lang-option').forEach(opt=>{opt.addEventListener('click',()=>{currentLang=opt.dataset.lang;localStorage.setItem('lang',currentLang);applyLanguage();});});
+const savedTheme=localStorage.getItem('theme')||'light';
+document.documentElement.className=savedTheme;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>BookVista — уютная книжная полка</title>
+    <meta name="description" content="Найдите свою следующую книгу. Бесплатные и платные издания, читайте с комфортом.">
+    <meta property="og:title" content="BookVista — уютная книжная полка">
+    <meta property="og:description" content="Поиск книг по жанрам, авторам и языкам. Сохраняйте в избранное.">
+    <meta property="og:url" content="https://alex803161.github.io/book-finder/">
+    <link rel="canonical" href="https://alex803161.github.io/book-finder/">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body class="light">
+<div class="container">
+    <div class="top-bar">
+        <div class="settings-panel">
+            <div class="settings-icon" id="settingsIcon">⚙️</div>
+            <div class="settings-dropdown" id="settingsDropdown">
+                <button class="btn-close-settings" id="closeSettings">✕</button>
+                <div class="setting-group">
+                    <label data-i18n="themeLabel">Тема</label>
+                    <div class="theme-toggle">
+                        <button id="themeLight" class="theme-btn active">☀️ Светлая</button>
+                        <button id="themeDark" class="theme-btn">🌙 Тёмная</button>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <label data-i18n="fontLabel">Шрифт</label>
+                    <select id="fontSelect">
+                        <option value="PT Serif, Georgia, serif">PT Serif</option>
+                        <option value="Georgia, serif">Georgia</option>
+                        <option value="Roboto, sans-serif">Roboto</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label data-i18n="fontSizeLabel">Размер шрифта</label>
+                    <input type="range" id="fontSizeSlider" min="14" max="24" value="18" step="1">
+                    <span id="fontSizeValue">18px</span>
+                </div>
+                <div class="setting-group">
+                    <label data-i18n="textColorLabel">Цвет текста</label>
+                    <div class="color-preset" id="colorPresets">
+                        <span class="color-dot active" data-color="#3E2723" style="background:#3E2723;"></span>
+                        <span class="color-dot" data-color="#1A1A1A" style="background:#1A1A1A;"></span>
+                        <span class="color-dot" data-color="#4A4A4A" style="background:#4A4A4A;"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="lang-switch" id="langSwitch">
+            <span class="lang-option active" data-lang="ru">🇷🇺</span>
+            <span class="lang-option" data-lang="en">🇬🇧</span>
+        </div>
+    </div>
+    <div class="header">
+        <div class="logo-text">📚 BookVista</div>
+        <h1 class="page-title" data-i18n="pageTitle">Уютная книжная полка</h1>
+    </div>
+    <div class="search-section">
+        <div class="search-row">
+            <input type="text" id="searchInput" class="search-input" data-i18n-placeholder="searchPlaceholder" placeholder="Название книги или автор..." autocomplete="off">
+            <button id="searchButton" class="search-btn"><span data-i18n="searchBtn">Искать</span></button>
+        </div>
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label data-i18n="filterGenre">Жанр</label>
+                <select id="filterGenre" class="filter-select">
+                    <option value="" data-i18n="genreAny">Все жанры</option>
+                    <option value="fiction">Художественная литература</option>
+                    <option value="nonfiction">Документальная проза</option>
+                    <option value="science">Наука и технологии</option>
+                    <option value="history">История</option>
+                    <option value="biography">Биографии и мемуары</option>
+                    <option value="fantasy">Фэнтези</option>
+                    <option value="mystery">Детективы и триллеры</option>
+                    <option value="romance">Любовные романы</option>
+                    <option value="horror">Ужасы и мистика</option>
+                    <option value="poetry">Поэзия</option>
+                    <option value="philosophy">Философия</option>
+                    <option value="psychology">Психология</option>
+                    <option value="self-help">Саморазвитие</option>
+                    <option value="business">Бизнес и экономика</option>
+                    <option value="art">Искусство и культура</option>
+                    <option value="cooking">Кулинария</option>
+                    <option value="travel">Путешествия</option>
+                    <option value="children">Детская литература</option>
+                    <option value="comics">Комиксы и графические романы</option>
+                    <option value="religion">Религия и духовность</option>
+                    <option value="education">Образование</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label data-i18n="filterLang">Язык</label>
+                <select id="filterLang" class="filter-select">
+                    <option value="" data-i18n="langAny">Любой язык</option>
+                    <option value="ru">Русский</option>
+                    <option value="en">Английский</option>
+                    <option value="de">Немецкий</option>
+                    <option value="fr">Французский</option>
+                    <option value="es">Испанский</option>
+                    <option value="it">Итальянский</option>
+                    <option value="pt">Португальский</option>
+                    <option value="zh">Китайский</option>
+                    <option value="ja">Японский</option>
+                    <option value="ko">Корейский</option>
+                    <option value="ar">Арабский</option>
+                    <option value="he">Иврит</option>
+                    <option value="tr">Турецкий</option>
+                    <option value="pl">Польский</option>
+                    <option value="uk">Украинский</option>
+                    <option value="be">Белорусский</option>
+                    <option value="kk">Казахский</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="results-header">
+        <div class="counter"><span data-i18n="foundPrefix">Найдено:</span> <span id="totalBooks">0</span></div>
+    </div>
+    <div id="booksContainer" class="books-list"></div>
+    <div style="text-align:center;">
+        <button id="loadMoreBtn" class="load-more-btn" style="display:none;" data-i18n="loadMoreBtn">Загрузить ещё</button>
+    </div>
+    <div style="text-align:center; margin: 30px 0; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <a href="favorites.html" class="btn btn-outline" data-i18n="favorites">Избранное</a>
+        <a href="post-book.html" class="btn btn-outline" data-i18n="addBook">Добавить книгу</a>
+        <a href="admin.html" class="btn btn-outline" data-i18n="admin">Управление</a>
+    </div>
+    <div class="subscribe-section">
+        <h3 data-i18n="subscribeBtn" style="margin-bottom:12px;">Подписаться на обновления</h3>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <input type="email" id="subEmail" data-i18n-placeholder="emailPlaceholder" placeholder="Ваш email" style="flex:1; min-width:200px;">
+            <button class="btn btn-primary" id="subBtn" data-i18n="subscribeBtn">Подписаться</button>
+        </div>
+        <p id="subMsg" style="margin-top:8px; color:var(--accent-color);"></p>
+    </div>
+    <div style="margin:30px 0;">
+        <h3 data-i18n="titleRecent" style="margin-bottom:16px;">Недавно просмотренные</h3>
+        <div id="recentGrid" class="books-list"></div>
+    </div>
+    <div style="margin:30px 0;">
+        <h3 data-i18n="titleSaved" style="margin-bottom:16px;">Сохранённые поиски</h3>
+        <div id="savedSearchesList" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+    </div>
+    <footer class="site-footer">
+        <div>
+            <p data-i18n="footerText">© 2025 BookVista — уютная книжная полка</p>
+            <p><a href="privacy.html" data-i18n="privacy">Конфиденциальность</a> | <a href="terms.html" data-i18n="terms">Условия</a> | <a href="contacts.html" data-i18n="contacts">Контакты</a></p>
+        </div>
+    </footer>
+</div>
+<script src="translations.js"></script>
+<script>
+const STORAGE_KEY='bookvista_';
+let currentLang=localStorage.getItem('lang')||'ru';
+let books=[],filteredBooks=[],displayCount=12,currentQuery='';
+const GOOGLE_BOOKS_API='https://www.googleapis.com/books/v1/volumes';
+document.addEventListener('DOMContentLoaded',()=>{applyLanguage();loadInitialBooks();setupEventListeners();setupSettingsPanel();});
+function t(key){return translations[currentLang]?.[key]||key;}
+function applyLanguage(){
+document.documentElement.lang=currentLang;
+document.querySelectorAll('[data-i18n]').forEach(el=>{if(el.tagName==='INPUT'||el.tagName==='TEXTAREA')return;el.textContent=t(el.getAttribute('data-i18n'));});
+document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{el.placeholder=t(el.getAttribute('data-i18n-placeholder'));});
+document.querySelectorAll('.lang-option').forEach(opt=>opt.classList.toggle('active',opt.dataset.lang===currentLang));
+document.title=t('siteName');
+if(filteredBooks.length)renderBooks();
+}
+function setupSettingsPanel(){
+const icon=document.getElementById('settingsIcon');
+const dropdown=document.getElementById('settingsDropdown');
+const closeBtn=document.getElementById('closeSettings');
+icon.addEventListener('click',()=>dropdown.classList.toggle('show'));
+closeBtn.addEventListener('click',()=>dropdown.classList.remove('show'));
+document.addEventListener('click',(e)=>{if(!icon.contains(e.target)&&!dropdown.contains(e.target))dropdown.classList.remove('show');});
+const savedTheme=localStorage.getItem('theme')||'light';
+document.documentElement.className=savedTheme;
+document.getElementById('themeLight').classList.toggle('active',savedTheme==='light');
+document.getElementById('themeDark').classList.toggle('active',savedTheme==='dark');
+document.getElementById('themeLight').addEventListener('click',()=>setTheme('light'));
+document.getElementById('themeDark').addEventListener('click',()=>setTheme('dark'));
+const savedFont=localStorage.getItem('font')||'PT Serif, Georgia, serif';
+document.getElementById('fontSelect').value=savedFont;
+document.documentElement.style.setProperty('--font-family',savedFont);
+document.getElementById('fontSelect').addEventListener('change',(e)=>{document.documentElement.style.setProperty('--font-family',e.target.value);localStorage.setItem('font',e.target.value);});
+const savedFontSize=localStorage.getItem('fontSize')||'18';
+document.getElementById('fontSizeSlider').value=savedFontSize;
+document.getElementById('fontSizeValue').textContent=savedFontSize+'px';
+document.documentElement.style.setProperty('--font-size',savedFontSize+'px');
+document.getElementById('fontSizeSlider').addEventListener('input',(e)=>{document.documentElement.style.setProperty('--font-size',e.target.value+'px');document.getElementById('fontSizeValue').textContent=e.target.value+'px';localStorage.setItem('fontSize',e.target.value);});
+const savedColor=localStorage.getItem('textColor')||'#3E2723';
+document.documentElement.style.setProperty('--text-color',savedColor);
+document.querySelectorAll('.color-dot').forEach(dot=>{dot.classList.toggle('active',dot.dataset.color===savedColor);dot.addEventListener('click',()=>{document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('active'));dot.classList.add('active');document.documentElement.style.setProperty('--text-color',dot.dataset.color);localStorage.setItem('textColor',dot.dataset.color);});});
+}
+function setTheme(theme){document.documentElement.className=theme;localStorage.setItem('theme',theme);document.getElementById('themeLight').classList.toggle('active',theme==='light');document.getElementById('themeDark').classList.toggle('active',theme==='dark');}
+async function loadInitialBooks(){
+try{
+const resp=await fetch(GOOGLE_BOOKS_API+'?q=subject:fiction&orderBy=newest&maxResults=20&langRestrict='+currentLang);
+const data=await resp.json();
+books=(data.items||[]).map(mapGoogleBook);
+filteredBooks=[...books];
+renderBooks();
+}catch(e){books=getSampleBooks();filteredBooks=[...books];renderBooks();}
+}
+async function searchBooks(query){
+try{
+const resp=await fetch(GOOGLE_BOOKS_API+'?q='+encodeURIComponent(query));
+const data=await resp.json();
+books=(data.items||[]).map(mapGoogleBook);
+applyFilters();saveSearch(query);
+}catch(e){
+filteredBooks=books.filter(b=>b.title.toLowerCase().includes(query.toLowerCase())||b.author.toLowerCase().includes(query.toLowerCase()));
+renderBooks();
+}
+}
+function mapGoogleBook(item){const info=item.volumeInfo||{};return{id:item.id,title:info.title||'Без названия',author:(info.authors||['Неизвестен']).join(', '),genre:(info.categories||['fiction'])[0].toLowerCase(),language:info.language||'ru',cover:info.imageLinks?.thumbnail||'',description:info.description||'',rating:info.averageRating||(Math.random()*2+3).toFixed(1),price:info.saleInfo?.retailPrice?.amount||(Math.random()>0.6?Math.floor(Math.random()*500):0),buyLink:info.canonicalVolumeLink||'#',isFree:!info.saleInfo?.retailPrice};}
+function getSampleBooks(){return[{id:'1',title:'Мастер и Маргарита',author:'М. Булгаков',genre:'fiction',language:'ru',rating:4.8,price:350,cover:'',buyLink:'#'},{id:'2',title:'1984',author:'Дж. Оруэлл',genre:'fantasy',language:'ru',rating:4.6,price:0,cover:'',buyLink:'#'},{id:'3',title:'Sapiens',author:'Ю. Н. Харари',genre:'nonfiction',language:'ru',rating:4.7,price:590,cover:'',buyLink:'#'},{id:'4',title:'Убийство в Восточном экспрессе',author:'А. Кристи',genre:'mystery',language:'ru',rating:4.5,price:280,cover:'',buyLink:'#'}];}
+function renderBooks(){
+const grid=document.getElementById('booksContainer');
+const toShow=filteredBooks.slice(0,displayCount);
+document.getElementById('totalBooks').textContent=filteredBooks.length;
+if(!toShow.length){grid.innerHTML='<p style="grid-column:1/-1;text-align:center;">'+t('noResults')+'</p>';document.getElementById('loadMoreBtn').style.display='none';return;}
+grid.innerHTML=toShow.map(book=>'<div class="book-card" onclick="openBook(\''+book.id+'\')"><div class="book-cover" style="'+(book.cover?'background-image:url('+book.cover+');background-size:cover;':'')+'">'+(book.cover?'':'📚')+'</div><div class="book-info" style="flex:1;display:flex;flex-direction:column;gap:4px;"><div class="book-title">'+book.title+'</div><div class="book-author">'+book.author+'</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto;font-size:0.8rem;"><span>★ '+book.rating+'</span><span style="font-weight:700;color:var(--accent-color);">'+(book.price>0?book.price+' ₽':t('priceFree'))+'</span></div></div><div class="book-actions" onclick="event.stopPropagation();"><button class="save-btn'+(isFavorite(book.id)?' saved':'')+'" onclick="toggleFavorite(\''+book.id+'\')" title="'+(isFavorite(book.id)?t('removeFav'):t('addFav'))+'">'+(isFavorite(book.id)?'❤️':'🤍')+'</button><a href="'+book.buyLink+'" target="_blank" class="btn-buy">'+(book.isFree?t('read'):t('buy'))+'</a></div></div>').join('');
+document.getElementById('loadMoreBtn').style.display=filteredBooks.length>displayCount?'inline-flex':'none';
+renderRecent();
+}
+function renderRecent(){const recent=JSON.parse(localStorage.getItem(STORAGE_KEY+'recent')||'[]');const grid=document.getElementById('recentGrid');if(!grid||!recent.length){if(grid)grid.innerHTML='';return;}grid.innerHTML=recent.slice(0,4).map(book=>'<div class="book-card" onclick="window.location.href=\'book.html?id='+book.id+'\'"><div class="book-cover">📖</div><div class="book-title">'+book.title+'</div><div class="book-author">'+book.author+'</div></div>').join('');}
+function applyFilters(){const genre=document.getElementById('filterGenre').value;const lang=document.getElementById('filterLang').value;filteredBooks=books.filter(b=>(!genre||b.genre===genre)&&(!lang||b.language===lang));displayCount=12;renderBooks();}
+function getFavorites(){return JSON.parse(localStorage.getItem(STORAGE_KEY+'fav')||'[]');}
+function isFavorite(id){return getFavorites().some(f=>f.id===id);}
+function toggleFavorite(id){const favs=getFavorites();const book=books.find(b=>b.id===id);if(!book)return;const idx=favs.findIndex(f=>f.id===id);if(idx>-1)favs.splice(idx,1);else favs.push({id:book.id,title:book.title,author:book.author,rating:book.rating,price:book.price,cover:book.cover});localStorage.setItem(STORAGE_KEY+'fav',JSON.stringify(favs));renderBooks();}
+function openBook(id){const book=books.find(b=>b.id===id);if(!book)return;const recent=JSON.parse(localStorage.getItem(STORAGE_KEY+'recent')||'[]');const filtered=recent.filter(r=>r.id!==id);filtered.unshift({id:book.id,title:book.title,author:book.author});localStorage.setItem(STORAGE_KEY+'recent',JSON.stringify(filtered.slice(0,20)));window.location.href='book.html?id='+id;}
+function saveSearch(query){const searches=JSON.parse(localStorage.getItem(STORAGE_KEY+'searches')||'[]');if(!searches.includes(query)){searches.unshift(query);localStorage.setItem(STORAGE_KEY+'searches',JSON.stringify(searches.slice(0,10)));renderSavedSearches();}}
+function renderSavedSearches(){const searches=JSON.parse(localStorage.getItem(STORAGE_KEY+'searches')||'[]');const container=document.getElementById('savedSearchesList');if(!container)return;container.innerHTML=searches.map(s=>'<button class="btn btn-outline" style="font-size:0.85rem;" onclick="document.getElementById(\'searchInput\').value=\''+s+'\';searchBooks(\''+s+'\')">'+s+'</button>').join('');}
+function subscribe(email){const subs=JSON.parse(localStorage.getItem(STORAGE_KEY+'subs')||'[]');if(subs.includes(email)){document.getElementById('subMsg').textContent=t('subscriptionExists');return;}subs.push(email);localStorage.setItem(STORAGE_KEY+'subs',JSON.stringify(subs));document.getElementById('subMsg').textContent=t('subscriptionSuccess');}
+function setupEventListeners(){
+document.getElementById('searchButton').addEventListener('click',()=>{currentQuery=document.getElementById('searchInput').value.trim();if(currentQuery)searchBooks(currentQuery);});
+document.getElementById('searchInput').addEventListener('keypress',(e)=>{if(e.key==='Enter'){currentQuery=e.target.value.trim();if(currentQuery)searchBooks(currentQuery);}});
+document.getElementById('filterGenre').addEventListener('change',()=>{applyFilters();});
+document.getElementById('filterLang').addEventListener('change',()=>{applyFilters();});
+document.getElementById('loadMoreBtn').addEventListener('click',()=>{displayCount+=12;renderBooks();});
+document.getElementById('subBtn').addEventListener('click',()=>{const email=document.getElementById('subEmail').value.trim();if(email)subscribe(email);});
+document.querySelectorAll('.lang-option').forEach(opt=>{opt.addEventListener('click',()=>{currentLang=opt.dataset.lang;localStorage.setItem('lang',currentLang);applyLanguage();});});
+renderSavedSearches();renderRecent();
+}
+</script>
+</body>
+</html>

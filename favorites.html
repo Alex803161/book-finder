@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Избранное — BookVista</title>
+    <meta name="description" content="Ваши избранные книги">
+    <link rel="canonical" href="https://alex803161.github.io/book-finder/favorites.html">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body class="light">
+<div class="container">
+    <div class="top-bar">
+        <a href="index.html" style="text-decoration:none;color:var(--accent-color);font-weight:700;font-size:1.2rem;">📚 BookVista</a>
+        <div class="lang-switch" id="langSwitch">
+            <span class="lang-option active" data-lang="ru">🇷🇺</span>
+            <span class="lang-option" data-lang="en">🇬🇧</span>
+        </div>
+    </div>
+    <main style="margin-top:30px;">
+        <h1 data-i18n="titleFav" style="margin-bottom:20px;">Избранные книги</h1>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
+            <button class="btn btn-outline" id="exportBtn" data-i18n="exportCsv">Экспорт CSV</button>
+            <button class="btn btn-outline" id="clearBtn" data-i18n="clearAll">Очистить всё</button>
+            <select id="sortSelect" class="filter-select" style="width:auto;">
+                <option value="new" data-i18n="sortNew">Новые</option>
+                <option value="rating" data-i18n="sortRating">По рейтингу</option>
+                <option value="price" data-i18n="sortPrice">По цене</option>
+            </select>
+        </div>
+        <div id="favGrid" class="books-list"></div>
+        <div style="text-align:center;margin-top:20px;">
+            <a href="index.html" class="btn btn-outline" data-i18n="backToHome">На главную</a>
+        </div>
+    </main>
+    <footer class="site-footer">
+        <p data-i18n="footerText">© 2025 BookVista — уютная книжная полка</p>
+    </footer>
+</div>
+<script src="translations.js"></script>
+<script>
+const STORAGE_KEY='bookvista_';
+let currentLang=localStorage.getItem('lang')||'ru';
+function t(k){return translations[currentLang]?.[k]||k;}
+function applyLanguage(){
+document.documentElement.lang=currentLang;
+document.querySelectorAll('[data-i18n]').forEach(el=>{if(el.tagName==='OPTION')el.textContent=t(el.getAttribute('data-i18n'));else el.textContent=t(el.getAttribute('data-i18n'));});
+document.querySelectorAll('.lang-option').forEach(opt=>opt.classList.toggle('active',opt.dataset.lang===currentLang));
+renderFavorites(document.getElementById('sortSelect').value);
+}
+function renderFavorites(sort='new'){
+const favs=JSON.parse(localStorage.getItem(STORAGE_KEY+'fav')||'[]');
+if(sort==='rating')favs.sort((a,b)=>(b.rating||0)-(a.rating||0));
+else if(sort==='price')favs.sort((a,b)=>(a.price||0)-(b.price||0));
+const grid=document.getElementById('favGrid');
+if(!favs.length){grid.innerHTML='<p style="grid-column:1/-1;text-align:center;padding:40px;">Нет избранных книг</p>';return;}
+grid.innerHTML=favs.map(book=>'<div class="book-card"><div class="book-cover">📚</div><div class="book-title">'+book.title+'</div><div class="book-author">'+book.author+'</div>'+(book.rating?'<div style="font-size:0.85rem;">★ '+book.rating+'</div>':'')+'<div class="book-actions" style="margin-top:8px;"><button class="save-btn saved" onclick="removeFavorite(\''+book.id+'\')">❤️</button></div></div>').join('');
+}
+function removeFavorite(id){
+const favs=JSON.parse(localStorage.getItem(STORAGE_KEY+'fav')||'[]');
+localStorage.setItem(STORAGE_KEY+'fav',JSON.stringify(favs.filter(f=>f.id!==id)));
+renderFavorites(document.getElementById('sortSelect').value);
+}
+function exportCSV(){
+const favs=JSON.parse(localStorage.getItem(STORAGE_KEY+'fav')||'[]');
+const csv='Название,Автор,Рейтинг,Цена\n'+favs.map(f=>'"'+f.title+'","'+f.author+'",'+(f.rating||0)+','+(f.price||0)).join('\n');
+const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='favorites.csv';a.click();
+}
+document.addEventListener('DOMContentLoaded',()=>{
+applyLanguage();
+document.getElementById('sortSelect').addEventListener('change',e=>renderFavorites(e.target.value));
+document.getElementById('exportBtn').addEventListener('click',exportCSV);
+document.getElementById('clearBtn').addEventListener('click',()=>{if(confirm('Очистить избранное?')){localStorage.removeItem(STORAGE_KEY+'fav');renderFavorites();}});
+document.querySelectorAll('.lang-option').forEach(opt=>{opt.addEventListener('click',()=>{currentLang=opt.dataset.lang;localStorage.setItem('lang',currentLang);applyLanguage();});});
+const savedTheme=localStorage.getItem('theme')||'light';
+document.documentElement.className=savedTheme;
+});
+</script>
+</body>
+</html>
