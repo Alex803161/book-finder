@@ -1,4 +1,3 @@
-cat > ~/book-finder/index.html << 'ENDOFFILE'
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -13,6 +12,7 @@ cat > ~/book-finder/index.html << 'ENDOFFILE'
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
+    <script type="application/ld+json">{ "@context": "https://schema.org", "@type": "WebSite", "url": "https://alex803161.github.io/book-finder/", "name": "BookVista", "description": "Уютная книжная полка — поиск книг, рейтинги, избранное", "potentialAction": { "@type": "SearchAction", "target": "https://alex803161.github.io/book-finder/?q={search_term_string}", "query-input": "required name=search_term_string" } }</script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-B7CEKBWLWV"></script>
     <script>
@@ -241,29 +241,41 @@ language: (doc.language||['ru'])[0]||'ru',
 cover: coverUrl,
 description: (doc.first_sentence||[]).slice(0,3).join(' ')||'Описание отсутствует.',
 rating: (Math.random()*2+3).toFixed(1),
-price: Math.random()>0.6?Math.floor(Math.random()*500):0,
+price: null,
 buyLink: `https://www.litres.ru/search/?q=${encodeURIComponent(doc.title)}`,
-isFree: Math.random()>0.6
+isFree: false
 };
 }
-function getSampleBooks(){return[{id:'1',title:'Мастер и Маргарита',author:'М. Булгаков',genre:'fiction',language:'ru',rating:4.8,price:350,cover:'',buyLink:'#'},{id:'2',title:'1984',author:'Дж. Оруэлл',genre:'fantasy',language:'ru',rating:4.6,price:0,cover:'',buyLink:'#'},{id:'3',title:'Sapiens',author:'Ю. Н. Харари',genre:'nonfiction',language:'ru',rating:4.7,price:590,cover:'',buyLink:'#'},{id:'4',title:'Убийство в Восточном экспрессе',author:'А. Кристи',genre:'mystery',language:'ru',rating:4.5,price:280,cover:'',buyLink:'#'}];}
+function getSampleBooks(){return [{id:'1',title:'Мастер и Маргарита',author:'М. Булгаков',genre:'fiction',language:'ru',rating:4.8,price:null,cover:'',buyLink:'https://www.litres.ru/search/?q=Мастер+и+Маргарита',isFree:false},{id:'2',title:'1984',author:'Дж. Оруэлл',genre:'fantasy',language:'ru',rating:4.6,price:null,cover:'',buyLink:'https://www.litres.ru/search/?q=1984',isFree:false},{id:'3',title:'Sapiens',author:'Ю. Н. Харари',genre:'nonfiction',language:'ru',rating:4.7,price:null,cover:'',buyLink:'https://www.litres.ru/search/?q=Sapiens',isFree:false},{id:'4',title:'Убийство в Восточном экспрессе',author:'А. Кристи',genre:'mystery',language:'ru',rating:4.5,price:null,cover:'',buyLink:'https://www.litres.ru/search/?q=Убийство+в+Восточном+экспрессе',isFree:false}];}
 function renderBooks(){
 const grid=document.getElementById('booksContainer');
 const toShow=filteredBooks.slice(0,displayCount);
 document.getElementById('totalBooks').textContent=filteredBooks.length;
 if(!toShow.length){grid.innerHTML='<p style="grid-column:1/-1;text-align:center;" class="no-results-text">'+t('noResults')+'</p>';document.getElementById('loadMoreBtn').style.display='none';return;}
-grid.innerHTML=toShow.map(book=>'<div class="book-card" onclick="openBook(\''+book.id+'\')"><div class="book-cover" style="'+(book.cover?'background-image:url('+book.cover+');background-size:cover;':'')+'">'+(book.cover?'':'📚')+'</div><div class="book-info" style="flex:1;display:flex;flex-direction:column;gap:4px;"><div class="book-title">'+book.title+'</div><div class="book-author">'+book.author+'</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto;font-size:0.8rem;"><span>★ '+book.rating+'</span><span style="font-weight:700;color:var(--accent-color);">'+(book.price>0?book.price+' ₽':t('priceFree'))+'</span></div></div><div class="book-actions" onclick="event.stopPropagation();"><button class="save-btn'+(isFavorite(book.id)?' saved':'')+'" onclick="toggleFavorite(\''+book.id+'\')" title="'+(isFavorite(book.id)?t('removeFav'):t('addFav'))+'">'+(isFavorite(book.id)?'❤️':'🤍')+'</button><a href="'+book.buyLink+'" target="_blank" class="btn-buy">'+(book.isFree?t('read'):t('buy'))+'</a></div></div>').join('');
+grid.innerHTML=toShow.map(book=>'<div class="book-card" onclick="openBook(\''+book.id+'\')"><div class="book-cover" style="'+(book.cover?'background-image:url('+book.cover+');background-size:cover;':'')+'">'+(book.cover?'':'📚')+'</div><div class="book-info" style="flex:1;display:flex;flex-direction:column;gap:4px;"><div class="book-title">'+book.title+'</div><div class="book-author">'+book.author+'</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto;font-size:0.8rem;"><span>★ '+book.rating+'</span><span style="font-weight:700;color:var(--accent-color);">'+t('buy')+'</span></div></div><div class="book-actions" onclick="event.stopPropagation();"><button class="save-btn'+(isFavorite(book.id)?' saved':'')+'" onclick="toggleFavorite(\''+book.id+'\')" title="'+(isFavorite(book.id)?t('removeFav'):t('addFav'))+'">'+(isFavorite(book.id)?'❤️':'🤍')+'</button><a href="'+book.buyLink+'" target="_blank" class="btn-buy">'+t('buy')+'</a></div></div>').join('');
 document.getElementById('loadMoreBtn').style.display=filteredBooks.length>displayCount?'inline-flex':'none';
 renderRecent();
 }
-function renderRecent(){const recent=JSON.parse(localStorage.getItem(STORAGE_KEY+'recent')||'[]');const grid=document.getElementById('recentGrid');if(!grid||!recent.length){if(grid)grid.innerHTML='';return;}grid.innerHTML=recent.slice(0,4).map(book=>'<div class="book-card" onclick="window.location.href=\'book.html?id='+book.id+'\'"><div class="book-cover">📖</div><div class="book-title">'+book.title+'</div><div class="book-author">'+book.author+'</div></div>').join('');}
+function renderRecent(){
+const recent=JSON.parse(localStorage.getItem(STORAGE_KEY+'recent')||'[]');
+const grid=document.getElementById('recentGrid');
+if(!grid)return;
+if(!recent.length){grid.innerHTML='';return;}
+grid.innerHTML=recent.slice(0,4).map(book=>'<div class="book-card" style="position:relative;" onclick="window.location.href=\'book.html?id='+book.id+'\'"><button class="btn-close-settings" style="position:absolute;top:8px;right:8px;width:22px;height:22px;font-size:0.7rem;z-index:10;" onclick="event.stopPropagation();deleteRecent(\''+book.id+'\')">✕</button><div class="book-cover">📖</div><div class="book-title">'+book.title+'</div><div class="book-author">'+book.author+'</div></div>').join('');
+}
+function deleteRecent(id){
+const recent=JSON.parse(localStorage.getItem(STORAGE_KEY+'recent')||'[]');
+localStorage.setItem(STORAGE_KEY+'recent',JSON.stringify(recent.filter(r=>r.id!==id)));
+renderRecent();
+}
 function applyFilters(){const genre=document.getElementById('filterGenre').value;const lang=document.getElementById('filterLang').value;filteredBooks=books.filter(b=>(!genre||b.genre===genre)&&(!lang||b.language===lang));displayCount=12;renderBooks();}
 function getFavorites(){return JSON.parse(localStorage.getItem(STORAGE_KEY+'fav')||'[]');}
 function isFavorite(id){return getFavorites().some(f=>f.id===id);}
 function toggleFavorite(id){const favs=getFavorites();const book=books.find(b=>b.id===id);if(!book)return;const idx=favs.findIndex(f=>f.id===id);if(idx>-1)favs.splice(idx,1);else favs.push({id:book.id,title:book.title,author:book.author,rating:book.rating,price:book.price,cover:book.cover});localStorage.setItem(STORAGE_KEY+'fav',JSON.stringify(favs));renderBooks();}
 function openBook(id){const book=books.find(b=>b.id===id);if(!book)return;const recent=JSON.parse(localStorage.getItem(STORAGE_KEY+'recent')||'[]');const filtered=recent.filter(r=>r.id!==id);filtered.unshift({id:book.id,title:book.title,author:book.author});localStorage.setItem(STORAGE_KEY+'recent',JSON.stringify(filtered.slice(0,20)));window.location.href='book.html?id='+id;}
 function saveSearch(query){const searches=JSON.parse(localStorage.getItem(STORAGE_KEY+'searches')||'[]');if(!searches.includes(query)){searches.unshift(query);localStorage.setItem(STORAGE_KEY+'searches',JSON.stringify(searches.slice(0,10)));renderSavedSearches();}}
-function renderSavedSearches(){const searches=JSON.parse(localStorage.getItem(STORAGE_KEY+'searches')||'[]');const container=document.getElementById('savedSearchesList');if(!container)return;container.innerHTML=searches.map(s=>'<button class="btn btn-outline" style="font-size:0.85rem;" onclick="document.getElementById(\'searchInput\').value=\''+s+'\';searchBooks(\''+s+'\')">'+s+'</button>').join('');}
+function deleteSearch(query){const searches=JSON.parse(localStorage.getItem(STORAGE_KEY+'searches')||'[]');localStorage.setItem(STORAGE_KEY+'searches',JSON.stringify(searches.filter(s=>s!==query)));renderSavedSearches();}
+function renderSavedSearches(){const searches=JSON.parse(localStorage.getItem(STORAGE_KEY+'searches')||'[]');const container=document.getElementById('savedSearchesList');if(!container)return;container.innerHTML=searches.map(s=>'<span style="display:inline-flex;align-items:center;gap:4px;"><button class="btn btn-outline" style="font-size:0.85rem;" onclick="document.getElementById(\'searchInput\').value=\''+s+'\';searchBooks(\''+s+'\')">'+s+'</button><button class="btn-close-settings" style="width:20px;height:20px;font-size:0.7rem;" onclick="deleteSearch(\''+s+'\')">✕</button></span>').join('');}
 function subscribe(email){const subs=JSON.parse(localStorage.getItem(STORAGE_KEY+'subs')||'[]');if(subs.includes(email)){document.getElementById('subMsg').textContent=t('subscriptionExists');return;}subs.push(email);localStorage.setItem(STORAGE_KEY+'subs',JSON.stringify(subs));document.getElementById('subMsg').textContent=t('subscriptionSuccess');}
 function setupEventListeners(){
 document.getElementById('searchButton').addEventListener('click',()=>{currentQuery=document.getElementById('searchInput').value.trim();if(currentQuery)searchBooks(currentQuery);});
@@ -278,4 +290,3 @@ renderSavedSearches();renderRecent();
 </script>
 </body>
 </html>
-ENDOFFILE
