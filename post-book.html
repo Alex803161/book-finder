@@ -143,9 +143,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('postMsg').textContent = t('saveBtn') + '! Книга добавлена.';
         this.reset();
+        gtag('event', 'add_book', { event_category: 'engagement', event_label: title });
         setTimeout(() => { document.getElementById('postMsg').textContent = ''; }, 3000);
     });
 });
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/book-finder/sw.js')
+      .then(reg => console.log('SW registered'))
+      .catch(err => console.log('SW fail', err));
+  });
+}
 </script>
 </body>
 </html>
