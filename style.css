@@ -22,7 +22,7 @@ html.dark {
   --accent-color: #C8946E;
   --accent-hover: #D4A580;
   --card-shadow: 0 2px 8px rgba(0,0,0,0.4);
-  --text-shadow-light: 0 1px 4px rgba(0,0,0,0.6), 0 0 2px rgba(255,255,255,0.15);
+  --text-shadow-light: 0 1px 4px rgba(0,0,0,0.7), 0 0 3px rgba(255,255,255,0.25);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { overflow-x: hidden; width: 100%; }
@@ -208,10 +208,17 @@ html.dark .book-detail-cover { background: #3D3830; }
 h1, h2, h3 { color: var(--text-color); text-shadow: var(--text-shadow-light); }
 p, span, div { color: var(--text-color); }
 .no-results-text { color: var(--text-color) !important; text-shadow: var(--text-shadow-light) !important; }
-/* Дополнительно усиливаем читаемость в тёмной теме для указанных элементов */
+/* Усиленная читаемость для конкретных элементов в тёмной теме */
 html.dark h3, html.dark .subscribe-section h3, html.dark .site-footer, html.dark .no-results-text, html.dark .books-list p {
-  color: #F5EDE0 !important;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.7), 0 0 3px rgba(255,255,255,0.2) !important;
+  color: #FFF3E0 !important;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.8), 0 0 4px rgba(255,255,255,0.3) !important;
+}
+/* Заголовки секций "Недавно просмотренные" и "Сохранённые поиски" */
+html.dark #recentGrid + h3, html.dark #savedSearchesList + h3,
+html.dark #recentGrid ~ h3, html.dark #savedSearchesList ~ h3,
+html.dark h3[data-i18n="titleRecent"], html.dark h3[data-i18n="titleSaved"] {
+  color: #FFF3E0 !important;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.8), 0 0 4px rgba(255,255,255,0.3) !important;
 }
 @media (max-width: 600px) {
   :root { --container-padding: 10px; }
