@@ -1,23 +1,27 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-B7CEKBWLWV"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-B7CEKBWLWV');
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Добавить книгу — BookVista</title>
-    <meta name="robots" content="noindex">
-    <link rel="canonical" href="https://alex803161.github.io/book-finder/post-book.html">
+    <title>Книга — BookVista</title>
+    <meta name="description" content="Подробная информация о книге: автор, описание, рейтинг, цена.">
+    <meta property="og:title" content="Книга — BookVista">
+    <meta property="og:description" content="Автор, описание, рейтинг и где купить.">
+    <meta property="og:url" content="https://alex803161.github.io/book-finder/book.html">
+    <meta property="og:type" content="book">
+    <link rel="canonical" href="https://alex803161.github.io/book-finder/book.html">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-B7CEKBWLWV"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-B7CEKBWLWV');
+    </script>
+    <script type="application/ld+json" id="bookJsonLd"></script>
 </head>
 <body class="light">
 <div class="container">
@@ -28,26 +32,11 @@
             <span class="lang-option" data-lang="en">🇬🇧</span>
         </div>
     </div>
-    <main style="margin-top:30px;max-width:600px;">
-        <h1 data-i18n="addBookTitle" style="margin-bottom:20px;">Добавить книгу в каталог</h1>
-        <form id="addBookForm" style="display:flex;flex-direction:column;gap:16px;">
-            <input type="text" id="title" data-i18n-placeholder="bookTitleLabel" placeholder="Название книги" required>
-            <input type="text" id="author" data-i18n-placeholder="authorLabel" placeholder="Автор" required>
-            <select id="genre" class="filter-select">
-                <option value="fiction">Художественная литература</option>
-                <option value="nonfiction">Документальная проза</option>
-                <option value="fantasy">Фэнтези</option>
-                <option value="mystery">Детективы и триллеры</option>
-                <option value="science">Наука и технологии</option>
-                <option value="history">История</option>
-                <option value="biography">Биографии и мемуары</option>
-            </select>
-            <input type="number" id="price" data-i18n-placeholder="priceLabel" placeholder="Цена (руб.)" min="0">
-            <input type="url" id="cover" data-i18n-placeholder="coverUrlLabel" placeholder="Ссылка на обложку">
-            <textarea id="description" rows="4" data-i18n-placeholder="descriptionLabel" placeholder="Описание"></textarea>
-            <button type="submit" class="btn btn-primary" data-i18n="saveBtn">Сохранить</button>
-        </form>
-        <p id="formMsg" style="margin-top:12px;color:var(--accent-color);"></p>
+    <main style="margin-top:30px;">
+        <nav aria-label="Breadcrumb" style="margin-bottom:16px;font-size:0.9rem;color:var(--muted-color);">
+            <a href="index.html" style="color:var(--accent-color);">Главная</a> &rsaquo; <span id="breadcrumbTitle">Книга</span>
+        </nav>
+        <div id="bookDetail" class="book-detail"></div>
         <div style="text-align:center;margin-top:20px;">
             <a href="index.html" class="btn btn-outline" data-i18n="backToHome">На главную</a>
         </div>
@@ -60,34 +49,111 @@
 <script>
 const STORAGE_KEY='bookvista_';
 let currentLang=localStorage.getItem('lang')||'ru';
-function t(k){return translations[currentLang]?.[k]||k;}
+let book=null;
+function t(key){return translations[currentLang]?.[key]||key;}
 function applyLanguage(){
 document.documentElement.lang=currentLang;
 document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.getAttribute('data-i18n')));
-document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>el.placeholder=t(el.getAttribute('data-i18n-placeholder')));
 document.querySelectorAll('.lang-option').forEach(opt=>opt.classList.toggle('active',opt.dataset.lang===currentLang));
+if(book)updateSEOTags();
 }
+function updateSEOTags(){
+if(!book)return;
+document.title=book.title+' — '+t('siteName');
+document.querySelector('meta[name="description"]').setAttribute('content',(book.description||'').slice(0,160));
+document.querySelector('meta[property="og:title"]').setAttribute('content',book.title);
+document.querySelector('meta[property="og:description"]').setAttribute('content',(book.description||'').slice(0,160));
+document.querySelector('meta[property="og:url"]').setAttribute('content',window.location.href);
+if(book.cover){
+document.querySelector('meta[property="og:image"]')?.remove();
+const metaImage=document.createElement('meta');
+metaImage.setAttribute('property','og:image');
+metaImage.content=book.cover;
+document.head.appendChild(metaImage);
+}
+document.getElementById('breadcrumbTitle').textContent=book.title;
+const ld={
+  "@context":"https://schema.org",
+  "@type":"Book",
+  "name":book.title,
+  "author":{ "@type":"Person", "name":book.author },
+  "description":book.description,
+  "offers":{
+    "@type":"Offer",
+    "price":0,
+    "priceCurrency":"RUB",
+    "availability":"https://schema.org/InStock"
+  },
+  "aggregateRating": book.rating?{
+    "@type":"AggregateRating",
+    "ratingValue":book.rating,
+    "bestRating":"5"
+  }:undefined,
+  "image":book.cover||undefined
+};
+document.getElementById('bookJsonLd').textContent=JSON.stringify(ld);
+}
+async function loadBook(){
+const params=new URLSearchParams(window.location.search);
+const id=params.get('id');
+if(!id)return showError();
+const directBooks=JSON.parse(localStorage.getItem(STORAGE_KEY+'direct_books')||'[]');
+const directBook=directBooks.find(b=>b.id===id);
+if(directBook){book=mapDirectBook(directBook);renderBook();return;}
+try{
+const resp=await fetch('https://openlibrary.org/works/'+id+'.json');
+if(!resp.ok)throw new Error('Not found');
+const data=await resp.json();
+book=mapOpenLibraryDetail(data,id);
+renderBook();
+}catch(e){showError();}
+}
+function mapOpenLibraryDetail(data,id){
+const coverUrl=data.covers?`https://covers.openlibrary.org/b/id/${data.covers[0]}-L.jpg`:'';
+return {
+id: id,
+title: data.title||'Без названия',
+author: (data.authors||[]).map(a=>a.name||'Неизвестен').join(', ')||'Неизвестен',
+genre: (data.subjects||[''])[0]||'',
+language: (data.languages||[])[0]?.key?.replace('/languages/','')||'ru',
+cover: coverUrl,
+description: typeof data.description==='string'?data.description:(data.description?.value||'Описание отсутствует.'),
+rating: null,
+pages: data.number_of_pages||0,
+publisher: (data.publishers||[''])[0]||'',
+publishedDate: data.first_publish_date||'',
+isbn: (data.isbn_13||[])[0]||(data.isbn_10||[])[0]||'',
+price: null,
+buyLink: `https://www.litres.ru/search/?q=${encodeURIComponent(data.title)}`,
+isFree: false,
+previewLink: ''
+};
+}
+function mapDirectBook(d){return{id:d.id,title:d.title,author:d.author,genre:d.genre,language:d.language||'ru',cover:d.cover,description:d.description||'',rating:null,pages:0,publisher:'',publishedDate:'',isbn:'',price:null,buyLink:'#',isFree:false,previewLink:''};}
+function renderBook(){
+const container=document.getElementById('bookDetail');
+if(!book)return;
+updateSEOTags();
+const coverHTML=book.cover
+    ? `<img src="${book.cover}" alt="${book.title}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
+    : '';
+const placeholderHTML=book.cover
+    ? `<div class="book-cover-placeholder" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%;">📖</div>`
+    : `<div class="book-cover-placeholder" style="position:absolute; top:0; left:0; width:100%; height:100%;">📖</div>`;
+container.innerHTML='<div class="book-detail-cover" style="position:relative;">'+coverHTML+placeholderHTML+'</div><div class="book-detail-info"><h1>'+book.title+'</h1><div class="book-detail-author">'+book.author+'</div>'+(book.rating?'<p>★ '+book.rating+'</p>':'')+'<p>'+book.description+'</p>'+(book.pages?'<p>📄 '+book.pages+' стр.</p>':'')+(book.publisher?'<p>🏢 '+book.publisher+' ('+book.publishedDate+')</p>':'')+(book.isbn?'<p>🔢 ISBN: '+book.isbn+'</p>':'')+'<div style="display:flex;gap:12px;flex-wrap:wrap;"><a href="'+book.buyLink+'" target="_blank" class="btn btn-primary">'+t('buy')+'</a><button class="btn btn-outline" onclick="shareBook(\'wa\')">💬 '+t('shareWa')+'</button><button class="btn btn-outline" onclick="shareBook(\'tg\')">✈️ '+t('shareTg')+'</button><button class="btn btn-outline" onclick="reportBook()">'+t('report')+'</button></div></div>';
+}
+function shareBook(platform){
+if(!book)return;
+const url=encodeURIComponent(window.location.href);
+const text=encodeURIComponent(book.title+' — '+book.author);
+if(platform==='wa')window.open('https://wa.me/?text='+text+'%20'+url);
+else window.open('https://t.me/share/url?url='+url+'&text='+text);
+}
+function reportBook(){alert(t('reportSent'));}
+function showError(){document.getElementById('bookDetail').innerHTML='<p style="text-align:center;padding:40px;">'+t('bookNotFound')+'</p>';}
 document.addEventListener('DOMContentLoaded',()=>{
 applyLanguage();
-document.getElementById('addBookForm').addEventListener('submit',e=>{
-e.preventDefault();
-const book={
-id:'direct_'+Date.now(),
-title:document.getElementById('title').value.trim(),
-author:document.getElementById('author').value.trim(),
-genre:document.getElementById('genre').value,
-price:parseInt(document.getElementById('price').value)||0,
-cover:document.getElementById('cover').value.trim(),
-description:document.getElementById('description').value.trim(),
-language:currentLang,
-addedAt:new Date().toISOString()
-};
-const direct=JSON.parse(localStorage.getItem(STORAGE_KEY+'direct_books')||'[]');
-direct.push(book);
-localStorage.setItem(STORAGE_KEY+'direct_books',JSON.stringify(direct));
-document.getElementById('formMsg').textContent='Книга добавлена!';
-e.target.reset();
-});
+loadBook();
 document.querySelectorAll('.lang-option').forEach(opt=>{opt.addEventListener('click',()=>{currentLang=opt.dataset.lang;localStorage.setItem('lang',currentLang);applyLanguage();});});
 const savedTheme=localStorage.getItem('theme')||'light';
 document.documentElement.className=savedTheme;
