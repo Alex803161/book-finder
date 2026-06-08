@@ -86,5 +86,14 @@ applyLanguage();
 document.querySelectorAll('.lang-option').forEach(opt=>{opt.addEventListener('click',()=>{currentLang=opt.dataset.lang;localStorage.setItem('lang',currentLang);applyLanguage();});});
 });
 </script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/book-finder/sw.js')
+      .then(reg => console.log('SW registered'))
+      .catch(err => console.log('SW fail', err));
+  });
+}
+</script>
 </body>
 </html>
