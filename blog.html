@@ -128,8 +128,18 @@ document.getElementById('commentForm').addEventListener('submit', function(e){
     document.getElementById('commentMsg').textContent = 'Комментарий добавлен!';
     setTimeout(() => document.getElementById('commentMsg').textContent = '', 3000);
     loadComments();
+    gtag('event', 'comment_added', { event_category: 'engagement', event_label: 'blog_comment' });
 });
 loadComments();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/book-finder/sw.js')
+      .then(reg => console.log('SW registered'))
+      .catch(err => console.log('SW fail', err));
+  });
+}
 </script>
 </body>
 </html>
