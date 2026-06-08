@@ -34,6 +34,7 @@
       gtag('config', 'G-B7CEKBWLWV');
     </script>
     <meta name="verify-admitad" content="e0b2829499" />
+    <script src="affiliate-config.js"></script>
 </head>
 <body class="light">
 <div class="container">
@@ -151,6 +152,14 @@
         <h3 data-i18n="titleSaved" style="margin-bottom:16px;">Сохранённые поиски</h3>
         <div id="savedSearchesList" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
     </div>
+    <!-- Telegram-виджет -->
+    <div style="margin: 30px 0; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 24px; text-align: center; box-shadow: var(--card-shadow);">
+        <h3>✈️ Подпишитесь на наш Telegram-канал</h3>
+        <p style="margin: 8px 0 16px; color: var(--muted-color);">Книжные подборки, новинки и анонсы новых статей.</p>
+        <a href="https://t.me/ваш_канал" target="_blank" class="btn btn-primary" onclick="gtag('event', 'click', { event_category: 'social', event_label: 'telegram_widget' });">
+            Подписаться
+        </a>
+    </div>
     <footer class="site-footer">
         <div>
             <p data-i18n="footerText">© 2025 BookVista — уютная книжная полка</p>
@@ -264,7 +273,6 @@ function applyFiltersAndSort(){
     const sortBy=document.getElementById('sortSelect').value;
     if(sortBy==='rating'){
         filteredBooks.sort((a,b)=>{
-            // сортировка по итоговому рейтингу (пользовательский + из API)
             const aRating = getUserAverageRating(a.id) || a.rating || 0;
             const bRating = getUserAverageRating(b.id) || b.rating || 0;
             return bRating - aRating;
@@ -303,12 +311,9 @@ grid.innerHTML=toShow.map(book=>{
     const placeholderHTML=book.cover
         ? `<div class="book-cover-placeholder" style="display:none;">📖</div>`
         : `<div class="book-cover-placeholder">📖</div>`;
-    
-    // Итоговый рейтинг
     const userAvg = getUserAverageRating(book.id);
     const displayRating = userAvg !== null ? userAvg : book.rating;
     const ratingHTML = displayRating ? `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto;font-size:0.8rem;"><span>★ ${displayRating}</span></div>` : '';
-    
     return `<div class="book-card" onclick="openBook('${book.id}')">
         <div class="book-cover">
             ${coverHTML}
@@ -320,11 +325,13 @@ grid.innerHTML=toShow.map(book=>{
             ${ratingHTML}
             <div class="book-actions" onclick="event.stopPropagation();" style="margin-top:8px;">
                 <button class="save-btn${isFavorite(book.id)?' saved':''}" onclick="toggleFavorite('${book.id}')" title="${isFavorite(book.id)?t('removeFav'):t('addFav')}">${isFavorite(book.id)?'❤️':'🤍'}</button>
-                <a href="${book.buyLink}" target="_blank" class="btn-buy" onclick="gtag('event', 'click', { event_category: 'outbound', event_label: 'buy_button', value: '${book.title}' });">${t('buy')}</a>
+                <a href="${getBuyLink(book.title)}" target="_blank" class="btn-buy" onclick="gtag('event', 'click', { event_category: 'outbound', event_label: 'buy_button', value: '${book.title}' });">${t('buy')}</a>
             </div>
         </div>
     </div>`;
 }).join('');
+// Сохраняем до 200 книг для рекомендаций
+localStorage.setItem(STORAGE_KEY + 'all_books', JSON.stringify(books.slice(0, 200)));
 const totalPages=Math.ceil(filteredBooks.length/itemsPerPage);
 let paginationHTML='';
 if(totalPages>1){
