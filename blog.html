@@ -2,6 +2,18 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'light';
+      document.documentElement.className = theme;
+      const font = localStorage.getItem('font');
+      if (font) document.documentElement.style.setProperty('--font-family', font);
+      const fontSize = localStorage.getItem('fontSize');
+      if (fontSize) document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+      const textColor = localStorage.getItem('textColor');
+      if (textColor) document.documentElement.style.setProperty('--text-color', textColor);
+    })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Блог — BookVista</title>
     <meta name="description" content="Подборки книг и обзоры. Найдите свою идеальную книгу.">
@@ -31,14 +43,12 @@
         </div>
     </div>
     <main style="margin-top:30px;">
-        <!-- Хлебные крошки -->
         <nav aria-label="Breadcrumb" style="margin-bottom:16px;font-size:0.9rem;color:var(--muted-color);">
             <a href="index.html" style="color:var(--accent-color);">Главная</a> &rsaquo; <span>Блог</span>
         </nav>
         <h1 class="page-title">📖 Блог BookVista</h1>
         <p style="text-align:center; color:var(--muted-color); margin-bottom:30px;">Подборки, обзоры и рекомендации книг для уютного чтения</p>
         <div class="blog-grid">
-            <!-- Статья 1 -->
             <article class="blog-card" itemscope itemtype="https://schema.org/Article">
                 <meta itemprop="url" content="https://alex803161.github.io/book-finder/blog.html#article1">
                 <meta itemprop="datePublished" content="2026-06-08">
@@ -48,7 +58,6 @@
                 <p itemprop="description">Тёплые и атмосферные истории для длинных вечеров. От классики до современных бестселлеров.</p>
                 <a href="#" class="btn btn-outline">Читать →</a>
             </article>
-            <!-- Статья 2 -->
             <article class="blog-card" itemscope itemtype="https://schema.org/Article">
                 <meta itemprop="url" content="https://alex803161.github.io/book-finder/blog.html#article2">
                 <meta itemprop="datePublished" content="2026-06-05">
@@ -58,7 +67,6 @@
                 <p itemprop="description">Фэнтези, детективы, романы или научпоп — поможем найти идеальную книгу под ваш запрос.</p>
                 <a href="#" class="btn btn-outline">Читать →</a>
             </article>
-            <!-- Статья 3 -->
             <article class="blog-card" itemscope itemtype="https://schema.org/Article">
                 <meta itemprop="url" content="https://alex803161.github.io/book-finder/blog.html#article3">
                 <meta itemprop="datePublished" content="2026-06-01">
@@ -69,8 +77,6 @@
                 <a href="#" class="btn btn-outline">Читать →</a>
             </article>
         </div>
-
-        <!-- Локальные комментарии -->
         <section style="margin-top:50px;" id="commentsSection">
             <h2>💬 Комментарии</h2>
             <div id="commentsList" style="margin:16px 0;"></div>
@@ -81,7 +87,6 @@
             </form>
             <p id="commentMsg" style="margin-top:8px; color:var(--accent-color);"></p>
         </section>
-
         <div style="text-align:center; margin-top:30px;">
             <a href="index.html" class="btn btn-outline">← На главную</a>
         </div>
@@ -92,7 +97,6 @@
 </div>
 <script src="translations.js"></script>
 <script>
-// --- Комментарии (локальное хранилище) ---
 const COMMENT_KEY = 'bookvista_blog_comments';
 function loadComments(){
     const comments = JSON.parse(localStorage.getItem(COMMENT_KEY)||'[]');
@@ -125,12 +129,7 @@ document.getElementById('commentForm').addEventListener('submit', function(e){
     setTimeout(() => document.getElementById('commentMsg').textContent = '', 3000);
     loadComments();
 });
-// Загружаем комментарии при старте
 loadComments();
-
-// Применяем сохранённую тему
-const savedTheme=localStorage.getItem('theme')||'light';
-document.documentElement.className=savedTheme;
 </script>
 </body>
 </html>
