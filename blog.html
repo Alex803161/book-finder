@@ -32,6 +32,22 @@
       gtag('js', new Date());
       gtag('config', 'G-B7CEKBWLWV');
     </script>
+    <style>
+        .article-full {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+        .article-full.active {
+            display: block;
+        }
+        .blog-card .btn {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body class="light">
 <div class="container">
@@ -49,6 +65,7 @@
         <h1 class="page-title">📖 Блог BookVista</h1>
         <p style="text-align:center; color:var(--muted-color); margin-bottom:30px;">Подборки, обзоры и рекомендации книг для уютного чтения</p>
         <div class="blog-grid">
+            <!-- Статья 1 -->
             <article class="blog-card" itemscope itemtype="https://schema.org/Article">
                 <meta itemprop="url" content="https://alex803161.github.io/book-finder/blog.html#article1">
                 <meta itemprop="datePublished" content="2026-06-08">
@@ -56,8 +73,23 @@
                 <h2 itemprop="headline">📚 10 книг, которые стоит прочитать этой осенью</h2>
                 <p class="blog-meta">8 июня 2026</p>
                 <p itemprop="description">Тёплые и атмосферные истории для длинных вечеров. От классики до современных бестселлеров.</p>
-                <a href="#" class="btn btn-outline">Читать →</a>
+                <a class="btn btn-outline" onclick="toggleArticle('article1')">Читать →</a>
+                <div id="article1" class="article-full">
+                    <p>Осень — время уютных пледов, горячего чая и, конечно, хороших книг. Мы собрали десять произведений, которые идеально подходят для этого времени года.</p>
+                    <p><strong>1. «Мастер и Маргарита» — Михаил Булгаков.</strong> Мистическая история, в которой переплетаются любовь, философия и сатира.</p>
+                    <p><strong>2. «1984» — Джордж Оруэлл.</strong> Антиутопия, заставляющая задуматься о свободе и контроле.</p>
+                    <p><strong>3. «Убийство в Восточном экспрессе» — Агата Кристи.</strong> Классический детектив с неожиданной развязкой.</p>
+                    <p><strong>4. «Тень горы» — Грегори Дэвид Робертс.</strong> Продолжение «Шантарама», полное экзотики и приключений.</p>
+                    <p><strong>5. «Цветы для Элджернона» — Дэниел Киз.</strong> Трогательная история о разуме и человечности.</p>
+                    <p><strong>6. «Щегол» — Донна Тартт.</strong> Глубокий роман о потере, искусстве и взрослении.</p>
+                    <p><strong>7. «Дом, в котором...» — Мариам Петросян.</strong> Магический реализм в стенах интерната.</p>
+                    <p><strong>8. «Атлант расправил плечи» — Айн Рэнд.</strong> Философский роман о силе личности.</p>
+                    <p><strong>9. «Ночной цирк» — Эрин Моргенштерн.</strong> Волшебная сказка для взрослых.</p>
+                    <p><strong>10. «Книжный вор» — Маркус Зусак.</strong> История, рассказанная Смертью, о войне и книгах.</p>
+                    <a class="btn btn-outline" onclick="toggleArticle('article1')" style="margin-top:12px;">Свернуть</a>
+                </div>
             </article>
+            <!-- Статья 2 -->
             <article class="blog-card" itemscope itemtype="https://schema.org/Article">
                 <meta itemprop="url" content="https://alex803161.github.io/book-finder/blog.html#article2">
                 <meta itemprop="datePublished" content="2026-06-05">
@@ -65,8 +97,18 @@
                 <h2 itemprop="headline">🔍 Как выбрать книгу под настроение: гид по жанрам</h2>
                 <p class="blog-meta">5 июня 2026</p>
                 <p itemprop="description">Фэнтези, детективы, романы или научпоп — поможем найти идеальную книгу под ваш запрос.</p>
-                <a href="#" class="btn btn-outline">Читать →</a>
+                <a class="btn btn-outline" onclick="toggleArticle('article2')">Читать →</a>
+                <div id="article2" class="article-full">
+                    <p>Выбор книги — это как выбор блюда в меню: хочется того, что подходит именно сейчас. Вот краткий гид по жанрам, который поможет определиться.</p>
+                    <p><strong>🎭 Фэнтези и фантастика.</strong> Если хочется отвлечься от реальности — добро пожаловать в миры Дж. Р. Р. Толкина, Нила Геймана или братьев Стругацких. Магия, драконы и невероятные приключения поднимут настроение.</p>
+                    <p><strong>🔎 Детективы и триллеры.</strong> Когда разум требует загадок, а сердце — адреналина, выбирайте Агату Кристи, Артура Конан Дойля или Стига Ларссона. Отличный способ занять мозг вечером.</p>
+                    <p><strong>💖 Романы.</strong> Для душевного тепла и веры в любовь подойдут книги Норы Робертс, Джейн Остин или современных авторов вроде Колин Гувер. Лёгкое чтение для отдыха.</p>
+                    <p><strong>📚 Научпоп и нон-фикшн.</strong> Если хочется узнать что-то новое, обратите внимание на «Sapiens» Юваля Харари или «Краткую историю времени» Стивена Хокинга. Полезно и увлекательно.</p>
+                    <p>Главное — прислушайтесь к себе: иногда хочется плакать, иногда смеяться, а иногда просто побыть в тишине с книгой. BookVista поможет найти ту самую.</p>
+                    <a class="btn btn-outline" onclick="toggleArticle('article2')" style="margin-top:12px;">Свернуть</a>
+                </div>
             </article>
+            <!-- Статья 3 -->
             <article class="blog-card" itemscope itemtype="https://schema.org/Article">
                 <meta itemprop="url" content="https://alex803161.github.io/book-finder/blog.html#article3">
                 <meta itemprop="datePublished" content="2026-06-01">
@@ -74,9 +116,21 @@
                 <h2 itemprop="headline">👶 Детские книги, которые понравятся и взрослым</h2>
                 <p class="blog-meta">1 июня 2026</p>
                 <p itemprop="description">Совместное чтение с детьми может быть увлекательным и для родителей. Наши рекомендации.</p>
-                <a href="#" class="btn btn-outline">Читать →</a>
+                <a class="btn btn-outline" onclick="toggleArticle('article3')">Читать →</a>
+                <div id="article3" class="article-full">
+                    <p>Хорошая детская книга — это та, которую взрослый читает с не меньшим удовольствием. Вот наши фавориты.</p>
+                    <p><strong>1. «Маленький принц» — Антуан де Сент-Экзюпери.</strong> Вечная история о дружбе, ответственности и звёздах. Каждый раз открывается по-новому.</p>
+                    <p><strong>2. «Винни-Пух» — Алан Милн.</strong> Забавные приключения медвежонка и его друзей учат добру и простоте.</p>
+                    <p><strong>3. «Пеппи Длинныйчулок» — Астрид Линдгрен.</strong> Самая сильная девочка в мире учит детей (и взрослых) не бояться быть собой.</p>
+                    <p><strong>4. «Хроники Нарнии» — Клайв С. Льюис.</strong> Эпическое фэнтези с глубокими аллегориями, которое затягивает всю семью.</p>
+                    <p><strong>5. «Гарри Поттер» — Дж. К. Роулинг.</strong> Классика, с которой выросло не одно поколение. Читать вслух по вечерам — идеально.</p>
+                    <p>Совместное чтение не только развивает воображение ребёнка, но и создаёт тёплые семейные традиции. Выбирайте книгу — и вперёд к приключениям!</p>
+                    <a class="btn btn-outline" onclick="toggleArticle('article3')" style="margin-top:12px;">Свернуть</a>
+                </div>
             </article>
         </div>
+
+        <!-- Локальные комментарии -->
         <section style="margin-top:50px;" id="commentsSection">
             <h2>💬 Комментарии</h2>
             <div id="commentsList" style="margin:16px 0;"></div>
@@ -97,6 +151,21 @@
 </div>
 <script src="translations.js"></script>
 <script>
+// Функция переключения видимости статьи
+function toggleArticle(id) {
+    const article = document.getElementById(id);
+    if (article) {
+        article.classList.toggle('active');
+        // Прокрутка к статье при открытии
+        if (article.classList.contains('active')) {
+            article.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+    // Отслеживаем открытие статьи в GA
+    gtag('event', 'read_article', { event_category: 'engagement', event_label: id });
+}
+
+// Комментарии
 const COMMENT_KEY = 'bookvista_blog_comments';
 function loadComments(){
     const comments = JSON.parse(localStorage.getItem(COMMENT_KEY)||'[]');
