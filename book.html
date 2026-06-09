@@ -25,6 +25,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
+    <script src="affiliate-config.js"></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-B7CEKBWLWV"></script>
     <script>
@@ -50,6 +51,27 @@
         </nav>
         <div id="bookDetail" class="book-detail"></div>
 
+        <!-- Встроенный предпросмотр Open Library -->
+        <div id="bookPreview" style="display:none; margin-top:30px;">
+            <h3>📖 Читать фрагмент</h3>
+            <div style="position:relative; width:100%; padding-bottom:75%; border:1px solid var(--border-color); border-radius:12px; overflow:hidden;">
+                <iframe id="previewFrame"
+                        style="position:absolute; top:0; left:0; width:100%; height:100%; border:none;"
+                        allowfullscreen
+                        loading="lazy">
+                </iframe>
+            </div>
+            <p style="text-align:center; margin-top:8px;">
+                <small style="color:var(--muted-color);">Предоставлено <a href="https://openlibrary.org" target="_blank" rel="noopener">Open Library</a></small>
+            </p>
+        </div>
+
+        <!-- Похожие книги -->
+        <section id="similarBooks" style="margin-top:30px;">
+            <h3 data-i18n="similarBooks">📚 Похожие книги</h3>
+            <div id="similarGrid" class="books-list"></div>
+        </section>
+
         <!-- Блок пользовательского рейтинга и отзывов -->
         <section id="userRatingsSection" style="margin-top:40px; display:none;">
             <h2 data-i18n="ratingsTitle">⭐ Оцените книгу</h2>
@@ -63,9 +85,9 @@
             <h3 style="margin-top:30px;" data-i18n="reviewsTitle">💬 Отзывы</h3>
             <div id="reviewsList" style="margin:16px 0;"></div>
             <form id="reviewForm" style="display:flex; flex-direction:column; gap:12px; max-width:500px;">
-                <input type="text" id="reviewName" data-i18n-placeholder="reviewNamePlaceholder" placeholder="Ваше имя" required style="padding:10px; border:1px solid var(--border-color); border-radius:8px; background:var(--card-bg); color:var(--text-color);">
-                <textarea id="reviewText" rows="3" data-i18n-placeholder="reviewTextPlaceholder" placeholder="Напишите отзыв..." required style="padding:10px; border:1px solid var(--border-color); border-radius:8px; background:var(--card-bg); color:var(--text-color);"></textarea>
-                <button type="submit" class="btn btn-outline" style="align-self:flex-start;" data-i18n="submitReview">Отправить отзыв</button>
+                <input type="text" id="reviewName" placeholder="Ваше имя" required style="padding:10px; border:1px solid var(--border-color); border-radius:8px; background:var(--card-bg); color:var(--text-color);">
+                <textarea id="reviewText" rows="3" placeholder="Напишите отзыв..." required style="padding:10px; border:1px solid var(--border-color); border-radius:8px; background:var(--card-bg); color:var(--text-color);"></textarea>
+                <button type="submit" class="btn btn-outline" style="align-self:flex-start;">Отправить отзыв</button>
             </form>
             <p id="reviewMsg" style="margin-top:8px; color:var(--accent-color);"></p>
         </section>
@@ -94,9 +116,6 @@ document.querySelectorAll('[data-i18n]').forEach(el=>{
     if(el.tagName==='INPUT'||el.tagName==='TEXTAREA') return;
     el.textContent=t(el.getAttribute('data-i18n'));
 });
-document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
-    el.placeholder=t(el.getAttribute('data-i18n-placeholder'));
-});
 document.querySelectorAll('.lang-option').forEach(opt=>opt.classList.toggle('active',opt.dataset.lang===currentLang));
 if(book) updateSEOTags();
 }
@@ -117,8 +136,6 @@ if(book.cover){
     document.head.appendChild(metaImage);
 }
 document.getElementById('breadcrumbTitle').textContent = book.title;
-
-// Итоговый рейтинг
 const userRatingData = getUserRating();
 let finalRating = book.rating;
 if (userRatingData && userRatingData.count > 0) {
@@ -205,6 +222,55 @@ function renderRatingsAndReviews() {
     }
 }
 
+// Загрузка встроенного предпросмотра Open Library
+function loadPreview(workId) {
+    const previewDiv = document.getElementById('bookPreview');
+    const iframe = document.getElementById('previewFrame');
+    if (!workId || !previewDiv || !iframe) return;
+    iframe.src = `https://openlibrary.org/works/${workId}/embed/read`;
+    previewDiv.style.display = 'block';
+}
+
+// Загрузка похожих книг
+function loadSimilarBooks(genre, currentId) {
+    const container = document.getElementById('similarGrid');
+    if (!container) return;
+    const allBooks = JSON.parse(localStorage.getItem(STORAGE_KEY + 'all_books') || '[]');
+    let similar = allBooks.filter(b => b.genre === genre && b.id !== currentId);
+    if (similar.length === 0) {
+        fetch(`https://openlibrary.org/search.json?subject=${encodeURIComponent(genre)}&limit=5`)
+            .then(r => r.json())
+            .then(data => {
+                similar = (data.docs || []).map(doc => ({
+                    id: doc.key.replace('/works/','') || doc.cover_edition_key,
+                    title: doc.title,
+                    author: (doc.author_name||[''])[0],
+                    cover: doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg` : '',
+                    genre: genre
+                })).filter(b => b.id !== currentId);
+                renderSimilar(similar.slice(0, 4), container);
+            })
+            .catch(() => { container.innerHTML = '<p style="color:var(--muted-color);">Пока нет рекомендаций.</p>'; });
+        return;
+    }
+    renderSimilar(similar.slice(0, 4), container);
+}
+function renderSimilar(books, container) {
+    if (!books.length) {
+        container.innerHTML = '<p style="color:var(--muted-color);">Пока нет похожих книг.</p>';
+        return;
+    }
+    container.innerHTML = books.map(book => `
+        <div class="book-card" onclick="window.location.href='book.html?id=${book.id}'">
+            <div class="book-cover">
+                ${book.cover ? `<img src="${book.cover}" loading="lazy" onerror="this.style.display='none';">` : `<div class="book-cover-placeholder">📖</div>`}
+            </div>
+            <div class="book-title">${book.title}</div>
+            <div class="book-author">${book.author}</div>
+        </div>
+    `).join('');
+}
+
 async function loadBook(){
 const params=new URLSearchParams(window.location.search);
 const id=params.get('id');
@@ -212,7 +278,7 @@ if(!id)return showError();
 currentBookId = id;
 const directBooks=JSON.parse(localStorage.getItem(STORAGE_KEY+'direct_books')||'[]');
 const directBook=directBooks.find(b=>b.id===id);
-if(directBook){book=mapDirectBook(directBook);renderBook();renderRatingsAndReviews();return;}
+if(directBook){book=mapDirectBook(directBook);renderBook();renderRatingsAndReviews();loadSimilarBooks(book.genre, id);return;}
 try{
 const resp=await fetch('https://openlibrary.org/works/'+id+'.json');
 if(!resp.ok)throw new Error('Not found');
@@ -220,6 +286,8 @@ const data=await resp.json();
 book=mapOpenLibraryDetail(data,id);
 renderBook();
 renderRatingsAndReviews();
+loadSimilarBooks(book.genre, id);
+loadPreview(id);   // ← встроенный предпросмотр
 }catch(e){showError();}
 }
 
@@ -260,11 +328,21 @@ const coverHTML=book.cover
 const placeholderHTML=book.cover
     ? `<div class="book-cover-placeholder" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%;">📖</div>`
     : `<div class="book-cover-placeholder" style="position:absolute; top:0; left:0; width:100%; height:100%;">📖</div>`;
+
+// Кнопки действий — теперь с привязкой к встроенному предпросмотру
 let actionsHTML = `<div style="display:flex;gap:12px;flex-wrap:wrap;">
-    <a href="${book.buyLink}" target="_blank" class="btn btn-primary" onclick="gtag('event', 'click', { event_category: 'outbound', event_label: 'buy_button', value: '${book.title}' });">${t('buy')}</a>`;
-if(book.previewLink){
+    <a href="${getBuyLink(book.title)}" target="_blank" class="btn btn-primary" onclick="gtag('event', 'click', { event_category: 'outbound', event_label: 'buy_button', value: '${book.title}' });">${t('buy')}</a>`;
+
+// Если есть Open Library ID, предлагаем встроенный просмотр
+if (book.id && book.id.startsWith('OL') || book.id.match(/^[A-Za-z0-9_-]+$/)) {
+    actionsHTML += `<button class="btn btn-outline" onclick="document.getElementById('bookPreview').scrollIntoView({behavior:'smooth'}); gtag('event', 'preview', { event_category: 'engagement', event_label: 'read_preview_inline', value: '${book.title}' });">
+        📖 ${t('readPreview')}
+    </button>`;
+} else if (book.previewLink) {
+    // Резервная кнопка — внешний просмотр
     actionsHTML += `<a href="${book.previewLink}" target="_blank" class="btn btn-outline" onclick="gtag('event', 'preview', { event_category: 'engagement', event_label: 'read_preview', value: '${book.title}' });">${t('readPreview')}</a>`;
 }
+
 if(book.downloadLink){
     actionsHTML += `<a href="${book.downloadLink}" target="_blank" class="btn btn-outline" onclick="gtag('event', 'download', { event_category: 'engagement', event_label: 'download_fragment', value: '${book.title}' });">${t('downloadFragment')}</a>`;
 }
