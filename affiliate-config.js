@@ -1,17 +1,15 @@
-// Партнёрские настройки BookVista
-// Замените на свои ID, когда одобрят заявки
 const AFFILIATE = {
+  buka: {
+    base: 'https://www.buka.ru/search?q=',
+    param: 'partner',
+    id: ''   // ← сюда впишете ID, когда одобрят
+  },
   litres: {
     base: 'https://www.litres.ru/search/?q=',
-    param: 'lfrom',       // например, lfrom=123456
-    id: ''                // ваш ID (пока пусто)
+    param: 'lfrom',
+    id: ''   // ← для будущего подключения ЛитРес
   },
-  bukvoed: {
-    base: 'https://www.bukvoed.ru/search?q=',
-    param: 'partner',
-    id: ''
-  },
-  defaultStore: 'litres'
+  defaultStore: 'buka'   // пока используем Бука
 };
 
 function getBuyLink(title, store = AFFILIATE.defaultStore) {
