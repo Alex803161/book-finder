@@ -2,14 +2,19 @@ const AFFILIATE = {
   buka: {
     base: 'https://www.buka.ru/search?q=',
     param: 'partner',
+    id: ''   // ← ID от Бука (ждём)
+  },
+  bookvoed: {
+    base: 'https://www.bookvoed.ru/search?q=',
+    param: 'partner',   // обычно Буквоед использует partner
     id: ''   // ← сюда впишете ID, когда одобрят
   },
   litres: {
     base: 'https://www.litres.ru/search/?q=',
     param: 'lfrom',
-    id: ''   // ← для будущего подключения ЛитРес
+    id: ''   // ← на будущее
   },
-  defaultStore: 'buka'   // пока используем Бука
+  defaultStore: 'buka'   // пока используем Бука (можно будет сменить)
 };
 
 function getBuyLink(title, store = AFFILIATE.defaultStore) {
