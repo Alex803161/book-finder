@@ -33,20 +33,9 @@
       gtag('config', 'G-B7CEKBWLWV');
     </script>
     <style>
-        .article-full {
-            display: none;
-            margin-top: 20px;
-            padding: 20px;
-            background: var(--card-bg);
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-        }
-        .article-full.active {
-            display: block;
-        }
-        .blog-card .btn {
-            cursor: pointer;
-        }
+        .article-full { display: none; margin-top: 20px; padding: 20px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); }
+        .article-full.active { display: block; }
+        .blog-card .btn { cursor: pointer; }
     </style>
 </head>
 <body class="light">
@@ -65,7 +54,6 @@
         <h1 class="page-title">📖 Блог BookVista</h1>
         <p style="text-align:center; color:var(--muted-color); margin-bottom:30px;">Подборки, обзоры и рекомендации книг для уютного чтения</p>
         <div class="blog-grid">
-            <!-- Статья 1 -->
             <article class="blog-card" itemscope itemtype="https://schema.org/Article">
                 <meta itemprop="url" content="https://alex803161.github.io/book-finder/blog.html#article1">
                 <meta itemprop="datePublished" content="2026-06-08">
@@ -89,7 +77,6 @@
                     <a class="btn btn-outline" onclick="toggleArticle('article1')" style="margin-top:12px;">Свернуть</a>
                 </div>
             </article>
-            <!-- Статья 2 -->
             <article class="blog-card" itemscope itemtype="https://schema.org/Article">
                 <meta itemprop="url" content="https://alex803161.github.io/book-finder/blog.html#article2">
                 <meta itemprop="datePublished" content="2026-06-05">
@@ -108,7 +95,6 @@
                     <a class="btn btn-outline" onclick="toggleArticle('article2')" style="margin-top:12px;">Свернуть</a>
                 </div>
             </article>
-            <!-- Статья 3 -->
             <article class="blog-card" itemscope itemtype="https://schema.org/Article">
                 <meta itemprop="url" content="https://alex803161.github.io/book-finder/blog.html#article3">
                 <meta itemprop="datePublished" content="2026-06-01">
@@ -129,7 +115,15 @@
                 </div>
             </article>
         </div>
-
+        <!-- Форма подписки -->
+        <div class="subscribe-section" style="margin-bottom:30px;">
+            <h3 data-i18n="subscribeBtn" style="margin-bottom:12px;">Подписаться на обновления</h3>
+            <form id="unisender-subscribe-form" onsubmit="subscribeUnisender(event)" style="display:flex; flex-direction:column; gap:12px; max-width:400px;">
+                <input type="email" id="subEmail" placeholder="Ваш email" required style="padding:12px; border:1px solid var(--border-color); border-radius:8px; background:var(--card-bg); color:var(--text-color);">
+                <button type="submit" class="btn btn-primary">Подписаться</button>
+                <p id="subMsg" style="margin-top:8px; color:var(--accent-color);"></p>
+            </form>
+        </div>
         <!-- Локальные комментарии -->
         <section style="margin-top:50px;" id="commentsSection">
             <h2>💬 Комментарии</h2>
@@ -151,21 +145,16 @@
 </div>
 <script src="translations.js"></script>
 <script>
-// Функция переключения видимости статьи
 function toggleArticle(id) {
     const article = document.getElementById(id);
     if (article) {
         article.classList.toggle('active');
-        // Прокрутка к статье при открытии
         if (article.classList.contains('active')) {
             article.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     }
-    // Отслеживаем открытие статьи в GA
     gtag('event', 'read_article', { event_category: 'engagement', event_label: id });
 }
-
-// Комментарии
 const COMMENT_KEY = 'bookvista_blog_comments';
 function loadComments(){
     const comments = JSON.parse(localStorage.getItem(COMMENT_KEY)||'[]');
@@ -200,6 +189,31 @@ document.getElementById('commentForm').addEventListener('submit', function(e){
     gtag('event', 'comment_added', { event_category: 'engagement', event_label: 'blog_comment' });
 });
 loadComments();
+</script>
+<script>
+// Форма подписки Unisender
+async function subscribeUnisender(e) {
+  e.preventDefault();
+  const email = document.getElementById('subEmail').value.trim();
+  if (!email) return;
+  const functionUrl = 'https://functions.yandexcloud.net/d4ee0jo7sp3ttn6ch7oa';
+  try {
+    const resp = await fetch(`${functionUrl}?email=${encodeURIComponent(email)}`);
+    const data = await resp.json();
+    const msg = document.getElementById('subMsg');
+    if (data.error) {
+      msg.textContent = 'Ошибка: ' + data.error;
+    } else {
+      msg.textContent = 'Вы подписаны!';
+      document.getElementById('unisender-subscribe-form').reset();
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'subscribe', { event_category: 'engagement', event_label: email });
+      }
+    }
+  } catch (err) {
+    document.getElementById('subMsg').textContent = 'Не удалось подписаться, попробуйте позже.';
+  }
+}
 </script>
 <script>
 if ('serviceWorker' in navigator) {
