@@ -138,11 +138,11 @@
     </div>
     <div class="subscribe-section">
         <h3 data-i18n="subscribeBtn" style="margin-bottom:12px;">Подписаться на обновления</h3>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <input type="email" id="subEmail" data-i18n-placeholder="emailPlaceholder" placeholder="Ваш email" style="flex:1; min-width:200px;">
-            <button class="btn btn-primary" id="subBtn" data-i18n="subscribeBtn">Подписаться</button>
-        </div>
-        <p id="subMsg" style="margin-top:8px; color:var(--accent-color);"></p>
+        <form id="unisender-subscribe-form" onsubmit="subscribeUnisender(event)" style="display:flex; flex-direction:column; gap:12px; max-width:400px;">
+            <input type="email" id="subEmail" placeholder="Ваш email" required style="padding:12px; border:1px solid var(--border-color); border-radius:8px; background:var(--card-bg); color:var(--text-color);">
+            <button type="submit" class="btn btn-primary">Подписаться</button>
+            <p id="subMsg" style="margin-top:8px; color:var(--accent-color);"></p>
+        </form>
     </div>
     <div style="margin:30px 0;">
         <h3 data-i18n="titleRecent" style="margin-bottom:16px;">Недавно просмотренные</h3>
@@ -330,7 +330,6 @@ grid.innerHTML=toShow.map(book=>{
         </div>
     </div>`;
 }).join('');
-// Сохраняем до 200 книг для рекомендаций
 localStorage.setItem(STORAGE_KEY + 'all_books', JSON.stringify(books.slice(0, 200)));
 const totalPages=Math.ceil(filteredBooks.length/itemsPerPage);
 let paginationHTML='';
@@ -399,9 +398,33 @@ document.getElementById('searchButton').addEventListener('click',()=>{currentQue
 document.getElementById('searchInput').addEventListener('keypress',(e)=>{if(e.key==='Enter'){currentQuery=e.target.value.trim();if(currentQuery)searchBooks(currentQuery);}});
 document.getElementById('filterGenre').addEventListener('change',()=>{applyFiltersAndSort();});
 document.getElementById('sortSelect').addEventListener('change',()=>{applyFiltersAndSort();});
-document.getElementById('subBtn').addEventListener('click',()=>{const email=document.getElementById('subEmail').value.trim();if(email)subscribe(email);});
 document.querySelectorAll('.lang-option').forEach(opt=>{opt.addEventListener('click',()=>{currentLang=opt.dataset.lang;localStorage.setItem('lang',currentLang);applyLanguage();});});
 renderSavedSearches();renderRecent();
+}
+</script>
+<script>
+// Форма подписки Unisender
+async function subscribeUnisender(e) {
+  e.preventDefault();
+  const email = document.getElementById('subEmail').value.trim();
+  if (!email) return;
+  const functionUrl = 'https://functions.yandexcloud.net/d4ee0jo7sp3ttn6ch7oa';
+  try {
+    const resp = await fetch(`${functionUrl}?email=${encodeURIComponent(email)}`);
+    const data = await resp.json();
+    const msg = document.getElementById('subMsg');
+    if (data.error) {
+      msg.textContent = 'Ошибка: ' + data.error;
+    } else {
+      msg.textContent = 'Вы подписаны!';
+      document.getElementById('unisender-subscribe-form').reset();
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'subscribe', { event_category: 'engagement', event_label: email });
+      }
+    }
+  } catch (err) {
+    document.getElementById('subMsg').textContent = 'Не удалось подписаться, попробуйте позже.';
+  }
 }
 </script>
 <script>
